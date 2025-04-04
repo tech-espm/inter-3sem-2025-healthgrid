@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Grid</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-heart-pulse"></i>
+                <div class="logo-text">
+                    <span class="logo-name">Health</span>
+                    <span class="logo-grid">Grid</span>
+                </div>
+            </div>
+            <div class="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#inicio">Início</a></li>
+                    <li><a href="#servicos">Soluções</a></li>
+                    <li><a href="#heatmap">Heatmap</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#equipe">Equipe</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Cuidamos da sua saúde com tecnologia para um atendimento mais eficiente.</h1>
+                <div class="service-buttons">
+                    <button class="service-btn">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monitoramento em Tempo Real</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-hospital"></i>
+                        <span>Gestão de Recursos</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-ambulance"></i>
+                        <span>Coordenação de Emergências</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-user-md"></i>
+                        <span>Atendimento Eficiente</span>
+                    </button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-container">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000" 
+                         alt="Ambulância moderna equipada" 
+                         class="hero-main-image">
+                </div>
+            </div>
+        </section>
+
+        <section id="servicos" class="services-section">
+            <div class="services-content">
+                <div class="services-text">
+                    <h2>Serviços para você</h2>
+                    <p>Sua saúde em primeiro lugar</p>
+                </div>
+                <div class="services-carousel">
+                    <div class="service-card">
+                        <i class="fas fa-heart-pulse"></i>
+                        <h3>Sensores de Pressão</h3>
+                        <p>Monitoramento contínuo dos sinais vitais dos pacientes com tecnologia de ponta e precisão máxima.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-map-location-dot"></i>
+                        <h3>Heatmap por Especialidade</h3>
+                        <p>Visualização em tempo real da ocupação hospitalar com análise preditiva de demanda.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-truck-medical"></i>
+                        <h3>Integração com Ambulâncias</h3>
+                        <p>Coordenação eficiente entre ambulâncias e hospitais com roteamento inteligente.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Redução do Tempo de Atendimento</h3>
+                        <p>Otimização dos processos de atendimento médico com análise de dados em tempo real.</p>
+                    </div>
+                </div>
+                <div class="carousel-buttons">
+                    <button class="carousel-button prev-button">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-button next-button">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="heatmap" class="heatmap-section">
+            <div class="heatmap-content">
+                <div class="heatmap-text">
+                    <h2>Heatmap Hospitalar</h2>
+                    <p>Visualize a ocupação hospitalar em tempo real e otimize a alocação de recursos. Nossa tecnologia permite identificar rapidamente áreas com maior demanda e distribuir os recursos de forma eficiente.</p>
+                </div>
+                <div class="heatmap-visualization">
+                    <div class="heatmap-placeholder">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="dashboard-section">
+            <h2>Dashboard</h2>
+            <div class="dashboard-container">
+                <div class="dashboard-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Estatísticas em Tempo Real</h3>
+                    <div class="chart-placeholder"></div>
+                </div>
+                <div class="dashboard-card">
+                    <i class="fas fa-hospital-user"></i>
+                    <h3>Ocupação Hospitalar</h3>
+                    <div class="chart-placeholder"></div>
+                </div>
+                <div class="dashboard-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Eficiência de Atendimento</h3>
+                    <div class="chart-placeholder"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="equipe" class="team-section">
+            <div class="team-content">
+                <h2>Nossa Equipe</h2>
+                <p class="team-subtitle">Conheça o time que está transformando a gestão hospitalar</p>
+                <div class="team-image">
+                    <img src="team.jpg" alt="Nossa Equipe">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p><i class="fas fa-phone"></i> (11) 1234-5678</p>
+                <p><i class="fas fa-envelope"></i> contato@medtech.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Redes Sociais</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 MedTech. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html> 
