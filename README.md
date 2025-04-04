@@ -18,6 +18,39 @@ A solução gira em torno de utilizar sensores de presença para verificar a dis
 
 É exibido como um mapa de calor para o motorista, facilitando a localização do hospital com a especialidade necessária de forma mais ágil, eficiente e com menor tempo de espera.
 
+## Configuração do Projeto
+
+Para executar, deve criar o arquivo `config.py` da seguinte forma:
+
+```python
+host = '0.0.0.0'
+port = 3000
+conexao_banco = 'mysql+mysqlconnector://usuario:senha@host/banco'
+url_api = 'https://site.com'
+```
+
+Todos os comandos abaixo assumem que o terminal esteja com o diretório atual na raiz do projeto.
+
+## Criação e Ativação do venv
+
+```
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Execução
+
+```
+.venv\Scripts\activate
+python app.py
+```
+
+## Mais Informações
+
+https://flask.palletsprojects.com/en/3.0.x/quickstart/
+https://flask.palletsprojects.com/en/3.0.x/tutorial/templates/
+
 # Licença
 
 Este projeto é licenciado sob a [MIT License](https://github.com/tech-espm/inter-3sem-healthgrid/blob/main/LICENSE).

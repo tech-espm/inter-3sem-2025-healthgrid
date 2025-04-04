@@ -14,7 +14,7 @@ USE healthgrid;
 -- topic espm/stainel/hpd/Temperature
 -- {"Temperature":24.30}
 CREATE TABLE pca (
-  id bigint NOT NULL AUTO_INCREMENT,
+  id bigint NOT NULL,
   data datetime NOT NULL,
   id_sensor tinyint NOT NULL,
   id_especialidade tinyint NOT NULL,
