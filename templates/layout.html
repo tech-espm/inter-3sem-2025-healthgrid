@@ -11,7 +11,7 @@
 	{% else %}
 	<title>Projeto</title>
 	{% endif %}
-
+	
 	<!--
 		https://getbootstrap.com/docs/4.6/getting-started/introduction/
 	-->
@@ -19,11 +19,13 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="/static/css/sweetalert2.min.css" />
 	<link rel="stylesheet" type="text/css" href="/static/css/estilo.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/static/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript" src="/static/js/sweetalert2.min.js"></script>
 	<script type="text/javascript" src="/static/js/projeto.js"></script>
+	<script type="module" src="script.js"></script>
 
 	{% block head %}{% endblock %}
 
@@ -38,21 +40,29 @@
 			https://getbootstrap.com/docs/4.6/components/navbar/
 		-->
 
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-			<a class="navbar-brand" href="/">
-				Projeto
-			</a>
-
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Alternar navegação">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-
-			<div class="collapse navbar-collapse" id="navbarToggler">
-				<div class="navbar-nav">
-					<a class="nav-link" href="/sobre">Sobre</a>
+		<header>
+			<div class="header-container">
+				<div class="logo">
+					<i class="fas fa-heart-pulse"></i>
+					<div class="logo-text">
+						<span class="logo-name">Health</span>
+						<span class="logo-grid">Grid</span>
+					</div>
 				</div>
+				<div class="menu-icon">
+					<i class="fas fa-bars"></i>
+				</div>
+				<nav class="main-nav">
+					<ul>
+						<li><a href="#inicio">Início</a></li>
+						<li><a href="#servicos">Soluções</a></li>
+						<li><a href="#heatmap">Heatmap</a></li>
+						<li><a href="#dashboard">Dashboard</a></li>
+						<li><a href="#equipe">Equipe</a></li>
+					</ul>
+				</nav>
 			</div>
-		</nav>
+		</header>
 
 		<div class="conteudo">
 
@@ -60,13 +70,27 @@
 
 		</div>
 
-		<div class="rodape">
-			<a class="link-rodape" href="https://sistemasdeinformacao.espm.edu.br" target="_blank">
-				<small>Desenvolvido em 2025 pelo curso de Sistemas de Informação da ESPM</small>
-				<br/>
-				<img src="/static/img/logo-si-512.png" style="width: 100%; max-width: 150px;" />
-			</a>
+		<footer>
+	<div class="footer-content">
+		<div class="footer-section">
+			<h3>Contato</h3>
+			<p><i class="fas fa-phone"></i> (11) 1234-5678</p>
+			<p><i class="fas fa-envelope"></i> contato@medtech.com</p>
 		</div>
+		<div class="footer-section">
+			<h3>Redes Sociais</h3>
+			<div class="social-links">
+				<a href="#"><i class="fab fa-instagram"></i></a>
+				<a href="#"><i class="fab fa-linkedin"></i></a>
+				<a href="#"><i class="fab fa-github"></i></a>
+				<a href="#"><i class="fas fa-envelope"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<p>&copy; 2024 MedTech. Todos os direitos reservados.</p>
+	</div>
+</footer>
 
 		{% block rodape %}{% endblock %}
 

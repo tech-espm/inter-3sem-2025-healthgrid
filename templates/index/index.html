@@ -2,163 +2,123 @@
 
 {% block body %}
 
-<div class="container-fluid">
+<main>
+	<section class="hero-section">
+		<div class="hero-content">
+			<h1>Cuidamos da sua saúde com tecnologia para um atendimento mais eficiente.</h1>
+			<div class="service-buttons">
+				<button class="service-btn">
+					<i class="fas fa-chart-line"></i>
+					<span>Monitoramento em Tempo Real</span>
+				</button>
+				<button class="service-btn">
+					<i class="fas fa-hospital"></i>
+					<span>Gestão de Recursos</span>
+				</button>
+				<button class="service-btn">
+					<i class="fas fa-ambulance"></i>
+					<span>Coordenação de Emergências</span>
+				</button>
+				<button class="service-btn">
+					<i class="fas fa-user-md"></i>
+					<span>Atendimento Eficiente</span>
+				</button>
+			</div>
+		</div>
+		<div class="hero-image">
+			<div class="hero-image-container">
+				<img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000"
+					alt="Ambulância moderna equipada" class="hero-main-image">
+			</div>
+		</div>
+	</section>
 
-	<h1>
-		Projeto
-	</h1>
-
-	<div class="row">
-		<div class="col-sm-4">
-
-			<div class="card shadow my-4">
-				<div class="card-body">
-					<form id="form">
-						<div class="form-group">
-							<label for="data">Data</label>
-							<input id="data" name="data" class="form-control" type="date" value="{{ hoje }}" />
-						</div>
-
-						<button type="submit" class="btn btn-primary">Listar</button>
-					</form>
+	<section id="servicos" class="services-section">
+		<div class="services-content">
+			<div class="services-text">
+				<h2>Serviços para você</h2>
+				<p>Sua saúde em primeiro lugar</p>
+			</div>
+			<div class="services-carousel">
+				<div class="service-card">
+					<i class="fas fa-heart-pulse"></i>
+					<h3>Sensores de Pressão</h3>
+					<p>Monitoramento contínuo dos sinais vitais dos pacientes com tecnologia de ponta e precisão máxima.
+					</p>
+				</div>
+				<div class="service-card">
+					<i class="fas fa-map-location-dot"></i>
+					<h3>Heatmap por Especialidade</h3>
+					<p>Visualização em tempo real da ocupação hospitalar com análise preditiva de demanda.</p>
+				</div>
+				<div class="service-card">
+					<i class="fas fa-truck-medical"></i>
+					<h3>Integração com Ambulâncias</h3>
+					<p>Coordenação eficiente entre ambulâncias e hospitais com roteamento inteligente.</p>
+				</div>
+				<div class="service-card">
+					<i class="fas fa-chart-line"></i>
+					<h3>Redução do Tempo de Atendimento</h3>
+					<p>Otimização dos processos de atendimento médico com análise de dados em tempo real.</p>
 				</div>
 			</div>
-
+			<div class="carousel-buttons">
+				<button class="carousel-button prev-button">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<button class="carousel-button next-button">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+			</div>
 		</div>
-	</div>
+	</section>
 
-	<div class="card shadow my-4">
-		<div class="card-body" id="div-grafico"></div>
-	</div>
+	<section id="heatmap" class="heatmap-section">
+		<div class="heatmap-content">
+			<div class="heatmap-text">
+				<h2>Heatmap Hospitalar</h2>
+				<p>Visualize a ocupação hospitalar em tempo real e otimize a alocação de recursos. Nossa tecnologia
+					permite identificar rapidamente áreas com maior demanda e distribuir os recursos de forma eficiente.
+				</p>
+			</div>
+			<div class="heatmap-visualization">
+				<div class="heatmap-placeholder">
+					
+				</div>
+			</div>
+		</div>
+	</section>
 
-</div>
+	<section id="dashboard" class="dashboard-section">
+		<h2>Dashboard</h2>
+		<div class="dashboard-container">
+			<div class="dashboard-card">
+				<i class="fas fa-chart-bar"></i>
+				<h3>Estatísticas em Tempo Real</h3>
+				<div class="chart-placeholder"></div>
+			</div>
+			<div class="dashboard-card">
+				<i class="fas fa-hospital-user"></i>
+				<h3>Ocupação Hospitalar</h3>
+				<div class="chart-placeholder"></div>
+			</div>
+			<div class="dashboard-card">
+				<i class="fas fa-clock"></i>
+				<h3>Eficiência de Atendimento</h3>
+				<div class="chart-placeholder"></div>
+			</div>
+		</div>
+	</section>
 
-<script src="/static/js/jquery-validate/jquery.validate.min.js"></script>
-<script src="/static/js/jquery-validate/additional-methods.min.js"></script>
-<script src="/static/js/jquery-validate/localization/messages_pt_BR.min.js"></script>
-<script type="text/javascript" src="/static/js/chart.js/chart.min.js"></script>
-
-<script type="text/javascript">
-	"use strict";
-
-	$("#form").validate({
-		rules: {
-			data: {
-				required: true
-			}
-		},
-		submitHandler: function () {
-			atualizarDados();
-		}
-	});
-
-	async function atualizarDados() {
-		waitSwal();
-
-		try {
-
-			let response = await fetch("/obterDados");
-
-			if (response.ok) {
-
-				Swal.close();
-
-				let div = document.getElementById("div-grafico");
-				div.innerHTML = '<canvas id="grafico-barras" style="height: 50vh;"></canvas>';
-
-				let labels = [], data = [];
-
-				let dados = await response.json();
-				if (!dados || !dados.length) {
-					Swal.fire("Erro", "Sem dados na data especificada!", "error");
-					return;
-				}
-
-				for (let i = 0; i < dados.length; i++) {
-					labels.push(dados[i].dia);
-					data.push(dados[i].valor);
-				}
-
-				let grafico = new Chart(document.getElementById("grafico-barras"), {
-					type: "bar",
-					data: {
-						labels: labels,
-						datasets: [{
-							label: "Valor",
-							backgroundColor: "#4e73df",
-							hoverBackgroundColor: "#2e59d9",
-							borderColor: "#4e73df",
-							data: data,
-						}],
-					},
-					options: {
-						maintainAspectRatio: false,
-						layout: {
-							padding: {
-								left: 10,
-								right: 25,
-								top: 25,
-								bottom: 0
-							}
-						},
-						scales: {
-							x: {
-								gridLines: {
-									display: false,
-									drawBorder: false
-								},
-								ticks: {
-									maxTicksLimit: 10
-								},
-								maxBarThickness: 25,
-							},
-							y: {
-								//display: false,
-								ticks: {
-									min: 0,
-									max: 10,
-									maxTicksLimit: 10,
-									padding: 10
-								},
-								gridLines: {
-									color: "rgb(234, 236, 244)",
-									zeroLineColor: "rgb(234, 236, 244)",
-									drawBorder: false,
-									borderDash: [2],
-									zeroLineBorderDash: [2]
-								}
-							},
-						},
-						legend: {
-							display: false
-						},
-						tooltips: {
-							titleMarginBottom: 10,
-							titleFontColor: '#6e707e',
-							titleFontSize: 14,
-							backgroundColor: "rgb(255,255,255)",
-							bodyFontColor: "#858796",
-							borderColor: '#dddfeb',
-							borderWidth: 1,
-							xPadding: 15,
-							yPadding: 15,
-							displayColors: false,
-							caretPadding: 10
-						},
-					}
-				});
-
-			} else {
-				await exibirErro(response);
-			}
-
-		} catch (ex) {
-			Swal.fire("Erro", "Erro ao listar os dados: " + ex.message, "error");
-		}
-	}
-
-	atualizarDados();
-
-</script>
+	<section id="equipe" class="team-section">
+		<div class="team-content">
+			<h2>Nossa Equipe</h2>
+			<p class="team-subtitle">Conheça o time que está transformando a gestão hospitalar</p>
+			<div class="team-image">
+				<img src="team.jpg" alt="Nossa Equipe">
+			</div>
+		</div>
+	</section>
+</main>
 
 {% endblock %}
