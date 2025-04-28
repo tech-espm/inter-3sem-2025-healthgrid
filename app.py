@@ -1,51 +1,48 @@
-from flask import Flask, render_template, json, request, Response
-import config
-import requests
+from flask import Flask, render_template, jsonify
 from datetime import datetime
 
 app = Flask(__name__)
 
-@app.get('/')
+@app.route('/')
 def index():
-    hoje = datetime.today().strftime('%Y-%m-%d')
-    return render_template('index/index.html', hoje=hoje)
+    return render_template('index/index.html')
 
-@app.get('/sobre')
+@app.route('/sobre')
 def sobre():
     return render_template('index/sobre.html', titulo='Sobre Nós')
 
-@app.get('/obterDados')
-def obterDados():
-    # Obter o maior id do banco
-    maior_id = 84164
+@app.route('/api/heatmap')
+def heatmap_data():
+    # Dados mockados para teste
+    return jsonify([
+        {'setor': 'UTI', 'ocupacao': 15, 'capacidade': 20, 'taxa_ocupacao': 75.0},
+        {'setor': 'Emergencia', 'ocupacao': 25, 'capacidade': 30, 'taxa_ocupacao': 83.3},
+        {'setor': 'Pediatria', 'ocupacao': 18, 'capacidade': 25, 'taxa_ocupacao': 72.0},
+        {'setor': 'Cardiologia', 'ocupacao': 12, 'capacidade': 15, 'taxa_ocupacao': 80.0},
+        {'setor': 'Ortopedia', 'ocupacao': 16, 'capacidade': 20, 'taxa_ocupacao': 80.0}
+    ])
 
-    resultado = requests.get(f'{config.url_api}?sensor=creative&id_inferior={maior_id}')
-    dados_novos = resultado.json()
+@app.route('/api/dashboard/stats')
+def dashboard_stats():
+    # Dados mockados para teste
+    return jsonify({
+        'total_internados': 86,
+        'atendimentos_hoje': 42,
+        'tempo_medio_atendimento': 45.5
+    })
 
-	# Inserir os dados novos no banco
-
-	# Trazer os dados do banco
-
-    dados = [
-        { 'dia': '10/09', 'valor': 80 },
-        { 'dia': '11/09', 'valor': 92 },
-        { 'dia': '12/09', 'valor': 90 },
-        { 'dia': '13/09', 'valor': 101 },
-        { 'dia': '14/09', 'valor': 105 },
-        { 'dia': '15/09', 'valor': 100 },
-        { 'dia': '16/09', 'valor': 64 },
-        { 'dia': '17/09', 'valor': 78 },
-        { 'dia': '18/09', 'valor': 93 },
-        { 'dia': '19/09', 'valor': 110 }
-    ];
-    return json.jsonify(dados)
-
-@app.post('/criar')
-def criar():
-    dados = request.json
-    print(dados['id'])
-    print(dados['nome'])
-    return Response(status=204)
+@app.route('/api/dashboard/ocupacao')
+def dashboard_ocupacao():
+    # Dados mockados para teste
+    return jsonify([
+        {'dia': '19/04', 'ocupacao': 75},
+        {'dia': '20/04', 'ocupacao': 82},
+        {'dia': '21/04', 'ocupacao': 78},
+        {'dia': '22/04', 'ocupacao': 85},
+        {'dia': '23/04', 'ocupacao': 90},
+        {'dia': '24/04', 'ocupacao': 86},
+        {'dia': '25/04', 'ocupacao': 88}
+    ])
 
 if __name__ == '__main__':
-    app.run(host=config.host, port=config.port)
+    app.run(debug=True, port=3000)

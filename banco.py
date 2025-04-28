@@ -78,5 +78,67 @@ def criarPessoa(nome, email):
 		# lista = [ ... ]
 		# sessao.execute(text("INSERT INTO pessoa (nome, email) VALUES (:nome, :email)"), lista)
 
+def obterDadosHeatmap():
+    with Session(engine) as sessao:
+        # Agrupa pessoas por primeira letra do nome para simular setores
+        dados = sessao.execute(text("""
+            SELECT 
+                LEFT(nome, 1) as setor,
+                COUNT(*) as ocupacao
+            FROM pessoa
+            GROUP BY LEFT(nome, 1)
+            ORDER BY LEFT(nome, 1)
+        """))
+        
+        resultado = []
+        for row in dados:
+            resultado.append({
+                'setor': row.setor,
+                'ocupacao': row.ocupacao,
+                'capacidade': 10,  # capacidade fixa para exemplo
+                'taxa_ocupacao': float(row.ocupacao * 10)  # multiplica por 10 para ter percentual
+            })
+        return resultado
+
+def obterEstatisticasGerais():
+    with Session(engine) as sessao:
+        # Obtém estatísticas da tabela pessoa
+        dados = sessao.execute(text("""
+            SELECT 
+                COUNT(*) as total_pessoas,
+                COUNT(DISTINCT email) as emails_unicos
+            FROM pessoa
+        """))
+        
+        row = dados.first()
+        return {
+            'total_internados': row.total_pessoas,
+            'atendimentos_hoje': row.emails_unicos,
+            'tempo_medio_atendimento': 30.5  # valor fixo para exemplo
+        }
+
+def obterOcupacaoUltimos7Dias():
+    with Session(engine) as sessao:
+        # Simula dados de ocupação usando o ID das pessoas
+        dados = sessao.execute(text("""
+            SELECT 
+                id % 7 as dia_id,
+                COUNT(*) as total
+            FROM pessoa
+            GROUP BY id % 7
+            ORDER BY dia_id
+        """))
+        
+        # Dias da semana para exemplo
+        dias = ['19/04', '20/04', '21/04', '22/04', '23/04', '24/04', '25/04']
+        
+        resultado = []
+        for row in dados:
+            resultado.append({
+                'dia': dias[row.dia_id],
+                'ocupacao': row.total
+            })
+        return resultado
+
 # Para mais informações:
 # https://docs.sqlalchemy.org/en/14/tutorial/dbapi_transactions.html

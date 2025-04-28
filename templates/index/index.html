@@ -1,124 +1,489 @@
 {% extends 'layout.html' %}
 
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js"></script>
+<style>
+    /* Scroll Arrow */
+    .scroll-arrow {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite;
+        cursor: pointer;
+        color: #3498db;
+        font-size: 2em;
+    }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Team Section */
+    .team-section {
+        padding: 50px 0;
+        background: #fff;
+        margin-bottom: 30px;
+    }
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    .team-member {
+        text-align: center;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    .team-member:hover {
+        transform: translateY(-5px);
+    }
+    .team-member img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 15px;
+        object-fit: cover;
+    }
+    .team-member h3 {
+        color: #2c3e50;
+        margin: 10px 0 5px;
+    }
+    .team-member p {
+        color: #7f8c8d;
+        margin: 5px 0;
+    }
+    .team-member .social-links {
+        margin-top: 15px;
+    }
+    .team-member .social-links a {
+        color: #3498db;
+        margin: 0 10px;
+        font-size: 1.2em;
+        transition: color 0.3s ease;
+    }
+    .team-member .social-links a:hover {
+        color: #2980b9;
+    }
+    /* Container */
+    .container { 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 20px; 
+    }
+
+    /* Hero Section */
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 50px 0;
+        background: #fff;
+        margin-bottom: 30px;
+    }
+    .hero-content {
+        flex: 1;
+        padding-right: 50px;
+    }
+    .hero-image {
+        flex: 1;
+        max-width: 500px;
+    }
+    .hero-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+    }
+    .service-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 30px;
+    }
+    .service-btn {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .service-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .service-btn i {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #3498db;
+    }
+
+    /* Services Section */
+    .services-section {
+        padding: 50px 0;
+        background: #f8f9fa;
+        margin-bottom: 30px;
+    }
+    .services-content {
+        text-align: center;
+    }
+    .services-text {
+        margin-bottom: 40px;
+    }
+    .services-carousel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 0 auto;
+        max-width: 1200px;
+    }
+    .service-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    .service-card:hover {
+        transform: translateY(-5px);
+    }
+    .service-card i {
+        font-size: 40px;
+        color: #3498db;
+        margin-bottom: 15px;
+    }
+    .service-card h3 {
+        margin: 15px 0;
+        color: #2c3e50;
+    }
+    .service-card p {
+        color: #7f8c8d;
+        line-height: 1.6;
+    }
+
+    /* Heatmap */
+    .heatmap-section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    #heatmap { 
+        height: 300px; 
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Dashboard */
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-card h3 {
+        margin: 0 0 15px 0;
+        color: #7f8c8d;
+        font-size: 1.1em;
+        text-transform: uppercase;
+    }
+    .stat-card p {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 2.5em;
+        font-weight: bold;
+    }
+    
+    /* Chart */
+    .chart-section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-
 <main>
-	<section class="hero-section">
-		<div class="hero-content">
-			<h1>Cuidamos da sua saúde com tecnologia para um atendimento mais eficiente.</h1>
-			<div class="service-buttons">
-				<button class="service-btn">
-					<i class="fas fa-chart-line"></i>
-					<span>Monitoramento em Tempo Real</span>
-				</button>
-				<button class="service-btn">
-					<i class="fas fa-hospital"></i>
-					<span>Gestão de Recursos</span>
-				</button>
-				<button class="service-btn">
-					<i class="fas fa-ambulance"></i>
-					<span>Coordenação de Emergências</span>
-				</button>
-				<button class="service-btn">
-					<i class="fas fa-user-md"></i>
-					<span>Atendimento Eficiente</span>
-				</button>
-			</div>
-		</div>
-		<div class="hero-image">
-			<div class="hero-image-container">
-				<img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000"
-					alt="Ambulância moderna equipada" class="hero-main-image">
-			</div>
-		</div>
-	</section>
+    <div class="container">
+        <section class="hero-section" style="position: relative;">
+            <div class="hero-content">
+                <h1>Cuidamos da sua saúde com tecnologia para um atendimento mais eficiente.</h1>
+                <div class="service-buttons">
+                    <button class="service-btn">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Monitoramento em Tempo Real</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-hospital"></i>
+                        <span>Gestão de Recursos</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-ambulance"></i>
+                        <span>Coordenação de Emergências</span>
+                    </button>
+                    <button class="service-btn">
+                        <i class="fas fa-user-md"></i>
+                        <span>Atendimento Eficiente</span>
+                    </button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-container">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2000"
+                        alt="Ambulância moderna equipada">
+                </div>
+            </div>
+                    <a href="#servicos" class="scroll-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </section>
 
-	<section id="servicos" class="services-section">
-		<div class="services-content">
-			<div class="services-text">
-				<h2>Serviços para você</h2>
-				<p>Sua saúde em primeiro lugar</p>
-			</div>
-			<div class="services-carousel">
-				<div class="service-card">
-					<i class="fas fa-heart-pulse"></i>
-					<h3>Sensores de Pressão</h3>
-					<p>Monitoramento contínuo dos sinais vitais dos pacientes com tecnologia de ponta e precisão máxima.
-					</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-map-location-dot"></i>
-					<h3>Heatmap por Especialidade</h3>
-					<p>Visualização em tempo real da ocupação hospitalar com análise preditiva de demanda.</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-truck-medical"></i>
-					<h3>Integração com Ambulâncias</h3>
-					<p>Coordenação eficiente entre ambulâncias e hospitais com roteamento inteligente.</p>
-				</div>
-				<div class="service-card">
-					<i class="fas fa-chart-line"></i>
-					<h3>Redução do Tempo de Atendimento</h3>
-					<p>Otimização dos processos de atendimento médico com análise de dados em tempo real.</p>
-				</div>
-			</div>
-			<div class="carousel-buttons">
-				<button class="carousel-button prev-button">
-					<i class="fas fa-chevron-left"></i>
-				</button>
-				<button class="carousel-button next-button">
-					<i class="fas fa-chevron-right"></i>
-				</button>
-			</div>
-		</div>
-	</section>
+        <section id="servicos" class="services-section">
+            <div class="services-content">
+                <div class="services-text">
+                    <h2>Serviços para você</h2>
+                    <p>Sua saúde em primeiro lugar</p>
+                </div>
+                <div class="services-carousel">
+                    <div class="service-card">
+                        <i class="fas fa-heart-pulse"></i>
+                        <h3>Sensores de Pressão</h3>
+                        <p>Monitoramento contínuo dos sinais vitais dos pacientes com tecnologia de ponta e precisão máxima.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-map-location-dot"></i>
+                        <h3>Heatmap por Especialidade</h3>
+                        <p>Visualização em tempo real da ocupação hospitalar com análise preditiva de demanda.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-truck-medical"></i>
+                        <h3>Integração com Ambulâncias</h3>
+                        <p>Coordenação eficiente entre ambulâncias e hospitais com roteamento inteligente.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Redução do Tempo de Atendimento</h3>
+                        <p>Otimização dos processos de atendimento médico com análise de dados em tempo real.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-	<section id="heatmap" class="heatmap-section">
-		<div class="heatmap-content">
-			<div class="heatmap-text">
-				<h2>Heatmap Hospitalar</h2>
-				<p>Visualize a ocupação hospitalar em tempo real e otimize a alocação de recursos. Nossa tecnologia
-					permite identificar rapidamente áreas com maior demanda e distribuir os recursos de forma eficiente.
-				</p>
-			</div>
-			<div class="heatmap-visualization">
-				<div class="heatmap-placeholder">
-					
-				</div>
-			</div>
-		</div>
-	</section>
+        <section class="team-section">
+            <div class="container">
+                <div class="text-center">
+                    <h2>Nossa Equipe</h2>
+                    <p>Profissionais dedicados ao seu bem-estar</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500" alt="Dr. Ana Silva">
+                        <h3>Dra. Ana Silva</h3>
+                        <p>Diretora Médica</p>
+                        <p>Especialista em Gestão Hospitalar</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Dr. Carlos Santos">
+                        <h3>Dr. Carlos Santos</h3>
+                        <p>Coordenador de Tecnologia</p>
+                        <p>PhD em Informática Médica</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500" alt="Dra. Marina Costa">
+                        <h3>Dra. Marina Costa</h3>
+                        <p>Coordenadora de Operações</p>
+                        <p>Especialista em Fluxo Hospitalar</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-	<section id="dashboard" class="dashboard-section">
-		<h2>Dashboard</h2>
-		<div class="dashboard-container">
-			<div class="dashboard-card">
-				<i class="fas fa-chart-bar"></i>
-				<h3>Estatísticas em Tempo Real</h3>
-				<div class="chart-placeholder"></div>
-			</div>
-			<div class="dashboard-card">
-				<i class="fas fa-hospital-user"></i>
-				<h3>Ocupação Hospitalar</h3>
-				<div class="chart-placeholder"></div>
-			</div>
-			<div class="dashboard-card">
-				<i class="fas fa-clock"></i>
-				<h3>Eficiência de Atendimento</h3>
-				<div class="chart-placeholder"></div>
-			</div>
-		</div>
-	</section>
+        <!-- Heatmap -->
+        <div class="heatmap-section">
+            <h2>Ocupação por Setor</h2>
+            <div id="heatmap"></div>
+        </div>
 
-	<section id="equipe" class="team-section">
-		<div class="team-content">
-			<h2>Nossa Equipe</h2>
-			<p class="team-subtitle">Conheça o time que está transformando a gestão hospitalar</p>
-			<div class="team-image">
-				<img src="team.jpg" alt="Nossa Equipe">
-			</div>
-		</div>
-	</section>
+        <!-- Dashboard Stats -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <h3>Total de Internados</h3>
+                <p id="total-internados">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Atendimentos Hoje</h3>
+                <p id="atendimentos-hoje">-</p>
+            </div>
+            <div class="stat-card">
+                <h3>Tempo Médio</h3>
+                <p id="tempo-medio">-</p>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-section">
+            <h2>Histórico de Ocupação</h2>
+            <div class="chart-container">
+                <canvas id="ocupacao-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurar heatmap
+        const heatmapInstance = h337.create({
+            container: document.getElementById('heatmap'),
+            radius: 40,
+            maxOpacity: 0.6,
+            minOpacity: 0.1,
+            blur: 0.75,
+            gradient: {
+                '.2': 'blue',
+                '.4': 'cyan',
+                '.6': 'lime',
+                '.8': 'yellow',
+                '.95': 'red'
+            }
+        });
+
+        // Carregar dados do heatmap
+        fetch('/api/heatmap')
+            .then(response => response.json())
+            .then(data => {
+                const width = document.getElementById('heatmap').offsetWidth;
+                const height = document.getElementById('heatmap').offsetHeight;
+                
+                // Criar pontos do heatmap
+                const points = data.map((item, index) => ({
+                    x: (width / (data.length + 1)) * (index + 1),
+                    y: height / 2,
+                    value: item.taxa_ocupacao,
+                    radius: 50
+                }));
+
+                heatmapInstance.setData({
+                    max: 100,
+                    data: points
+                });
+
+                // Adicionar labels
+                data.forEach((item, index) => {
+                    const label = document.createElement('div');
+                    label.style.position = 'absolute';
+                    label.style.left = `${(width / (data.length + 1)) * (index + 1)}px`;
+                    label.style.top = '10px';
+                    label.style.transform = 'translateX(-50%)';
+                    label.style.color = '#2c3e50';
+                    label.style.fontSize = '12px';
+                    label.style.fontWeight = 'bold';
+                    label.textContent = `${item.setor}`;
+                    document.getElementById('heatmap').appendChild(label);
+
+                    const value = document.createElement('div');
+                    value.style.position = 'absolute';
+                    value.style.left = `${(width / (data.length + 1)) * (index + 1)}px`;
+                    value.style.bottom = '10px';
+                    value.style.transform = 'translateX(-50%)';
+                    value.style.color = '#2c3e50';
+                    value.style.fontSize = '12px';
+                    value.textContent = `${item.ocupacao}/${item.capacidade}`;
+                    document.getElementById('heatmap').appendChild(value);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+
+        // Carregar estatísticas
+        fetch('/api/dashboard/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-internados').textContent = data.total_internados;
+                document.getElementById('atendimentos-hoje').textContent = data.atendimentos_hoje;
+                document.getElementById('tempo-medio').textContent = `${data.tempo_medio_atendimento.toFixed(1)}min`;
+            })
+            .catch(error => console.error('Erro:', error));
+
+        // Carregar gráfico de ocupação
+        fetch('/api/dashboard/ocupacao')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('ocupacao-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(item => item.dia),
+                        datasets: [{
+                            label: 'Ocupação',
+                            data: data.map(item => item.ocupacao),
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { display: false }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+    </script>
 </main>
-
 {% endblock %}
