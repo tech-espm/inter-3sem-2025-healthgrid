@@ -11,6 +11,7 @@
 ## Integrantes
 - [Arthur Borba](https://github.com/Borba70)
 - [Enrico Comassetto Di Gioia](https://github.com/EnricoDiGioia)
+- [Ana Carolina Albi Pereira](https://github.com/anacarolinaalbi)
 
 ## Descrição do Projeto
 
