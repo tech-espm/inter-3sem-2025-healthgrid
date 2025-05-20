@@ -1,17 +1,235 @@
 {% extends 'layout.html' %}
 
+{% block head %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #3498db, #2c3e50);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+        border-radius: 15px;
+        margin-bottom: 50px;
+    }
+
+    .about-section {
+        padding: 60px 0;
+    }
+
+    .mission-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+    .mission-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .mission-icon {
+        font-size: 2.5em;
+        color: #3498db;
+        margin-bottom: 20px;
+    }
+
+    .team-section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+        border-radius: 15px;
+        margin: 50px 0;
+    }
+
+    .team-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+    .team-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .team-member-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+        object-fit: cover;
+        border: 3px solid #3498db;
+    }
+
+    .team-member-social {
+        margin-top: 15px;
+    }
+
+    .team-member-social a {
+        color: #3498db;
+        margin: 0 10px;
+        font-size: 1.2em;
+        transition: color 0.3s;
+    }
+
+    .team-member-social a:hover {
+        color: #2c3e50;
+    }
+
+    .tech-stack {
+        padding: 60px 0;
+    }
+
+    .tech-item {
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .tech-icon {
+        font-size: 2em;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 40px 0;
+        }
+
+        .about-hero h1 {
+            font-size: 1.8em;
+        }
+
+        .mission-card, .team-card {
+            margin-bottom: 20px;
+        }
+
+        .team-member-img {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block body %}
+<main class="container">
+    <section class="about-hero">
+        <div class="container">
+            <h1>Sobre o HealthGrid</h1>
+            <p class="lead">Transformando o atendimento médico através da tecnologia</p>
+        </div>
+    </section>
 
-<div class="container-fluid">
+    <section class="about-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">🎯</div>
+                        <h3>Nossa Missão</h3>
+                        <p>Otimizar o sistema de saúde através de tecnologia inovadora, facilitando o acesso a informações em tempo real sobre disponibilidade de leitos hospitalares.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">👁️</div>
+                        <h3>Nossa Visão</h3>
+                        <p>Ser referência em soluções tecnológicas para gestão hospitalar, contribuindo para um sistema de saúde mais eficiente e acessível.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mission-card">
+                        <div class="mission-icon">💫</div>
+                        <h3>Nossos Valores</h3>
+                        <p>Inovação, transparência, compromisso com a excelência e foco no bem-estar dos pacientes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-	<h1>
-		Sobre
-	</h1>
+    <section class="team-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Nossa Equipe</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <img src="/static/img/team/member1.jpg" alt="Membro da Equipe" class="team-member-img">
+                        <h3>João Silva</h3>
+                        <p class="text-muted">Desenvolvedor Full Stack</p>
+                        <p>Especialista em desenvolvimento web e arquitetura de sistemas.</p>
+                        <div class="team-member-social">
+                            <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <img src="/static/img/team/member2.jpg" alt="Membro da Equipe" class="team-member-img">
+                        <h3>Maria Santos</h3>
+                        <p class="text-muted">UX/UI Designer</p>
+                        <p>Responsável pelo design de interface e experiência do usuário.</p>
+                        <div class="team-member-social">
+                            <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" target="_blank"><i class="fab fa-behance"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <img src="/static/img/team/member3.jpg" alt="Membro da Equipe" class="team-member-img">
+                        <h3>Pedro Oliveira</h3>
+                        <p class="text-muted">Especialista em Dados</p>
+                        <p>Focado em análise de dados e visualização de informações.</p>
+                        <div class="team-member-social">
+                            <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-	<p>
-		Sobre nós! 😊
-	</p>
-
-</div>
-
+    <section class="tech-stack">
+        <div class="container">
+            <h2 class="text-center mb-5">Nossa Tecnologia</h2>
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="tech-item">
+                        <div class="tech-icon">🌐</div>
+                        <h4>Web</h4>
+                        <p>HTML5, CSS3, JavaScript</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="tech-item">
+                        <div class="tech-icon">🐍</div>
+                        <h4>Backend</h4>
+                        <p>Python, Flask</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="tech-item">
+                        <div class="tech-icon">📊</div>
+                        <h4>Visualização</h4>
+                        <p>Chart.js, Heatmap.js</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="tech-item">
+                        <div class="tech-icon">🔒</div>
+                        <h4>Segurança</h4>
+                        <p>Autenticação e Criptografia</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 {% endblock %}
