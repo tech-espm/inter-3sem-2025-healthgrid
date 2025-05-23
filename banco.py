@@ -140,5 +140,80 @@ def obterOcupacaoUltimos7Dias():
             })
         return resultado
 
+def obterIdMaximo(tabela):
+	with Session(engine) as sessao:
+		registro = sessao.execute(text(f"SELECT MAX(id) id FROM {tabela}")).first()
+
+		if registro == None or registro.id == None:
+			return 0
+		else:
+			return registro.id
+
+def inserirDados(registros):
+	with Session(engine) as sessao, sessao.begin():
+		for registro in registros:
+			registro["id_especialidade"] = 1 if registro["id_sensor"] <= 4 else 2
+			sessao.execute(text("INSERT INTO pca (id, data, id_sensor, id_especialidade, delta, pessoas, luminosidade, umidade, temperatura) VALUES (:id, :data, :id_sensor, :id_especialidade, :delta, :pessoas, :luminosidade, :umidade, :temperatura)"), registro)
+
+def listarTempoReal():
+	with Session(engine) as sessao:
+		registros = sessao.execute(text("""
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 1 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 2 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 3 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 4 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 5 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 6 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 7 order by id desc limit 1)
+union all
+(select id_sensor, id_especialidade, case pessoas when 0 then 0 else 1 end ocupacao, date_format(data, '%d/%m/%Y %H:%i') data from pca where id_sensor = 8 order by id desc limit 1)
+		"""))
+		dados = []
+		for registro in registros:
+			dados.append({
+				"id_sensor": registro.id_sensor,
+				"id_especialidade": registro.id_especialidade,
+				"ocupacao": registro.ocupacao,
+				"data": registro.data,
+			})
+		return dados
+
+def listarHistorico(dataInicial, dataFinal):
+	parametros = {
+		"dataInicial": dataInicial + " 00:00:00",
+		"dataFinal": dataFinal + " 23:59:59"
+	}
+
+	with Session(engine) as sessao:
+		registros = sessao.execute(text("""
+select id_especialidade, taxa_ocupacao, date_format(dia, '%d/%m/%Y') data from
+(
+	select id_especialidade, cast((100 * sum(ocupacao) / 4) as float) taxa_ocupacao, dia from
+	(
+		select id_sensor, id_especialidade, case max(pessoas) when 0 then 0 else 1 end ocupacao, date(data) dia from pca
+		where data between :dataInicial and :dataFinal
+		group by id_sensor, id_especialidade, dia
+		order by id_sensor, id_especialidade, dia
+	) tmp
+	group by id_especialidade, dia
+	order by dia, id_especialidade
+) tmp2
+		""", parametros))
+		dados = []
+		for registro in registros:
+			dados.append({
+				"id_especialidade": registro.id_especialidade,
+				"especialidade": 'Pediatria' if registro.id_especialidade == 1 else 'UTI',
+				"taxa_ocupacao": registro.taxa_ocupacao,
+				"data": registro.data,
+			})
+		return dados
+
 # Para mais informações:
 # https://docs.sqlalchemy.org/en/14/tutorial/dbapi_transactions.html

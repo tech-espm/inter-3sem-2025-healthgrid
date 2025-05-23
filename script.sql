@@ -52,3 +52,16 @@ where data between '2025-03-10 00:00:00' and '2025-03-14 23:59:59'
 group by id_sensor, id_especialidade, dia
 order by id_sensor, id_especialidade, dia
 ;
+
+select id_especialidade, ocupacao, date_format(dia, '%d/%m/%Y') data from
+(
+	select id_especialidade, cast((100 * sum(ocupacao) / 4) as float) ocupacao, dia from
+	(
+		select id_sensor, id_especialidade, case max(pessoas) when 0 then 0 else 1 end ocupacao, date(data) dia from pca
+		where data between '2025-05-19 00:00:00' and '2025-05-23 23:59:59'
+		group by id_sensor, id_especialidade, dia
+		order by id_sensor, id_especialidade, dia
+	) tmp
+	group by id_especialidade, dia
+	order by dia, id_especialidade
+) tmp2

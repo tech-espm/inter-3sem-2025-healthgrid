@@ -2,9 +2,10 @@
 
 {% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="/static/js/chart.js/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <style>
     /* Base Styles */
     :root {
@@ -501,8 +502,10 @@
 
         <!-- Dashboard Sections -->
         <div class="heatmap-section">
-            <h2>Ocupação por Setor</h2>
-            <div id="heatmap"></div>
+            <h2>Ocupação Individual</h2>
+            <div id="div-grafico-individual"></div>
+            <h2>Ocupação por Especialidade</h2>
+            <div id="div-grafico-consolidado"></div>
         </div>
 
         <div class="dashboard">
@@ -540,22 +543,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize carousel
             initializeCarousel();
-            loadSectorOccupancy();
-            loadOccupancyHistory();
-            loadHeatmapData();
-            
-            // Configurar SSE para atualizações em tempo real
-            const eventSource = new EventSource('/stream');
-            
-            eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                updateCharts(data);
-            };
-            
-            eventSource.onerror = function(error) {
-                console.error('SSE Error:', error);
-                eventSource.close();
-            };
+            //loadSectorOccupancy();
+            //loadOccupancyHistory();
+            atualizarDados();
         });
 
         function initializeCarousel() {
@@ -710,39 +700,197 @@
             }
         }
 
-        async function loadHeatmapData() {
-            try {
-                const response = await axios.get('mysql+mysqlconnector://root:root@localhost/healthgrid');
-                const data = response.data;
-                
-                const heatmapContainer = document.getElementById('mysql+mysqlconnector://root:root@localhost/healthgrid');
-                if (heatmapContainer) {
-                    // Clear previous heatmap
-                    heatmapContainer.innerHTML = '';
-                    
-                    const heatmapInstance = h337.create({
-                        container: heatmapContainer,
-                        radius: 20,
-                        maxOpacity: 0.8,
-                        minOpacity: 0.3,
-                        gradient: {
-                            '.2': 'blue',
-                            '.4': 'cyan',
-                            '.6': 'lime',
-                            '.8': 'yellow',
-                            '.95': 'red'
-                        }
-                    });
+		async function atualizarDados() {
+			waitSwal();
 
-                    heatmapInstance.setData({
-                        max: Math.max(...data.map(item => item.value)),
-                        data: data
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading heatmap data:', error);
-            }
-        }
+			try {
+
+				let response = await fetch("/api/ocupacao");
+
+				if (response.ok) {
+
+					Swal.close();
+
+					let div = document.getElementById("div-grafico-individual");
+					div.innerHTML = '<canvas id="grafico-individual" style="height: 30vh;"></canvas>';
+
+					let labels = [], data = [];
+
+					let obj = await response.json();
+					const dados = obj?.dados;
+					const consolidados = obj?.consolidados;
+
+					if (!obj || !dados || !dados.length || !consolidados || !consolidados.length) {
+						Swal.fire("Erro", "Sem dados no período!", "error");
+						return;
+					}
+
+					for (let i = 0; i < dados.length; i++) {
+						labels.push(dados[i].especialidade + " (Id " + dados[i].id_sensor + ")");
+						data.push(dados[i].ocupacao);
+					}
+
+					let grafico = new Chart(document.getElementById("grafico-individual"), {
+						type: "bar",
+						data: {
+							labels: labels,
+							datasets: [{
+								label: "Ocupação Individual",
+								backgroundColor: "#4e73df",
+								hoverBackgroundColor: "#2e59d9",
+								borderColor: "#4e73df",
+								data: data,
+							}],
+						},
+						options: {
+							maintainAspectRatio: false,
+							layout: {
+								padding: {
+									left: 10,
+									right: 25,
+									top: 25,
+									bottom: 0
+								}
+							},
+							scales: {
+								x: {
+									gridLines: {
+										display: false,
+										drawBorder: false
+									},
+									ticks: {
+										maxTicksLimit: 10
+									},
+									maxBarThickness: 25,
+								},
+								y: {
+									min: 0,
+									max: 1,
+									//display: false,
+									ticks: {
+										min: 0,
+										max: 10,
+										maxTicksLimit: 10,
+										padding: 10
+									},
+									gridLines: {
+										color: "rgb(234, 236, 244)",
+										zeroLineColor: "rgb(234, 236, 244)",
+										drawBorder: false,
+										borderDash: [2],
+										zeroLineBorderDash: [2]
+									}
+								},
+							},
+							legend: {
+								display: false
+							},
+							tooltips: {
+								titleMarginBottom: 10,
+								titleFontColor: '#6e707e',
+								titleFontSize: 14,
+								backgroundColor: "rgb(255,255,255)",
+								bodyFontColor: "#858796",
+								borderColor: '#dddfeb',
+								borderWidth: 1,
+								xPadding: 15,
+								yPadding: 15,
+								displayColors: false,
+								caretPadding: 10
+							},
+						}
+					});
+
+					div = document.getElementById("div-grafico-consolidado");
+					div.innerHTML = '<canvas id="grafico-consolidado" style="height: 30vh;"></canvas>';
+
+					labels = [];
+					data = [];
+
+					for (let i = 0; i < consolidados.length; i++) {
+						labels.push(consolidados[i].especialidade);
+						data.push(consolidados[i].taxa_ocupacao);
+					}
+
+					grafico = new Chart(document.getElementById("grafico-consolidado"), {
+						type: "bar",
+						data: {
+							labels: labels,
+							datasets: [{
+								label: "Ocupação por Especialidade",
+								backgroundColor: "#4e73df",
+								hoverBackgroundColor: "#2e59d9",
+								borderColor: "#4e73df",
+								data: data,
+							}],
+						},
+						options: {
+							maintainAspectRatio: false,
+							layout: {
+								padding: {
+									left: 10,
+									right: 25,
+									top: 25,
+									bottom: 0
+								}
+							},
+							scales: {
+								x: {
+									gridLines: {
+										display: false,
+										drawBorder: false
+									},
+									ticks: {
+										maxTicksLimit: 10
+									},
+									maxBarThickness: 25,
+								},
+								y: {
+									min: 0,
+									max: 100,
+									//display: false,
+									ticks: {
+										min: 0,
+										max: 10,
+										maxTicksLimit: 10,
+										padding: 10
+									},
+									gridLines: {
+										color: "rgb(234, 236, 244)",
+										zeroLineColor: "rgb(234, 236, 244)",
+										drawBorder: false,
+										borderDash: [2],
+										zeroLineBorderDash: [2]
+									}
+								},
+							},
+							legend: {
+								display: false
+							},
+							tooltips: {
+								titleMarginBottom: 10,
+								titleFontColor: '#6e707e',
+								titleFontSize: 14,
+								backgroundColor: "rgb(255,255,255)",
+								bodyFontColor: "#858796",
+								borderColor: '#dddfeb',
+								borderWidth: 1,
+								xPadding: 15,
+								yPadding: 15,
+								displayColors: false,
+								caretPadding: 10
+							},
+						}
+					});
+
+				} else {
+					await exibirErro(response);
+				}
+
+			} catch (ex) {
+				Swal.fire("Erro", "Erro ao listar os dados: " + ex.message, "error");
+			}
+		}
     </script>
 </main>
 {% endblock %}
