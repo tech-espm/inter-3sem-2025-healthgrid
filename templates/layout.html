@@ -136,6 +136,27 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        .login-button {
+    width: 100%;
+    padding: 0.875rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.login-button:hover {
+    background: var(--primary-dark);
+}
     </style>
 
     {% block head %}{% endblock %}
@@ -165,6 +186,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/sobre">Sobre</a>
+                        </li>
+                         <li class="nav-item">
+                          <a class="nav-link" href="/login">Login</a>
                         </li>
                     </ul>
                 </div>

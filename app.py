@@ -14,6 +14,14 @@ def index():
 def sobre():
     return render_template('index/sobre.html', titulo='Sobre Nós')
 
+@app.route('/login')
+def login():
+    return render_template('index/login.html', titulo='Login')
+
+@app.route('/heatmap')
+def heatmap():
+    return render_template('index/heatmap.html', titulo='Heatmap')
+
 @app.route('/api/ocupacao')
 def ocupacao():
     # Obter o maior id do banco
