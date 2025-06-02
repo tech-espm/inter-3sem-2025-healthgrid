@@ -217,16 +217,16 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
     // Check if already logged in
     if (localStorage.getItem('userType')) {
-        window.location.href = 'index.html';
+        window.location.href = "/heatmap";  // Corrigido para redirecionar corretamente
         return;
     }
 
     // Toggle between user types
     const userTypeButtons = document.querySelectorAll('.user-type-toggle button');
-    let currentUserType = ' Equipe Enfermeiro';
+    let currentUserType = 'Equipe Enfermeiro';
 
     userTypeButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -244,14 +244,9 @@
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        // Here you would typically make an API call to your backend
-        // For demo purposes, we'll simulate a successful login
         if (email && password) {
-            // Store user type in localStorage
             localStorage.setItem('userType', currentUserType);
-            
-            // Redirect to the heatmap page
-            window.location.href = 'heatmap.html';
+            window.location.href = '/heatmap';  // Corresponde à sua rota Flask
         }
     });
 });

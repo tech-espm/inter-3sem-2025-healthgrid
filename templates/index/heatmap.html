@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block head %}
+<style>
 * {
             margin: 0;
             padding: 0;
@@ -144,9 +145,9 @@
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script>
         // Check if user is logged in
-        if (!localStorage.getItem('userType')) {
-            window.location.href = 'login.html';
-        }
+       if (!localStorage.getItem('userType')) {
+    window.location.href = '/login';  // Corresponde à sua rota Flask
+}
 
         // Display user type
         document.getElementById('userType').textContent = localStorage.getItem('userType');
@@ -154,8 +155,8 @@
         // Logout function
         function logout() {
             localStorage.removeItem('userType');
-            window.location.href = 'login.html';
-        }
+            window.location.href = '/login';
+       }
 
         // Configuração do mapa com limites geográficos de SP
         const map = L.map('map', {
