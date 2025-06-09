@@ -36,6 +36,14 @@ CREATE TABLE IF NOT EXISTS ocupacao_leitos (
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id)
 );
 
+CREATE TABLE IF NOT EXISTS Login (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(200) NOT NULL,
+    senha VARCHAR(200) NOT NULL,
+    tipo_usuario ENUM('ambulancia', 'enfermeiro') NOT NULL DEFAULT 'enfermeiro',
+    
+);
+
 -- Inserir alguns dados de exemplo nos setores
 INSERT INTO setores_hospital (setor, capacidade_maxima, descricao) VALUES
 ('UTI', 20, 'Unidade de Terapia Intensiva'),

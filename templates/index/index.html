@@ -459,80 +459,6 @@
             </div>
         </section>
 
-        <!-- Team Section -->
-        <section class="team-section">
-            <div class="container">
-                <h2>Nossa Equipe</h2>
-                <p>Profissionais dedicados ao seu bem-estar</p>
-                
-                <div class="team-grid">
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500" alt="Dr. Ana Silva" loading="lazy">
-                        <h3>Artur Napoles</h3>
-                        <p>Diretora Médica</p>
-                        <p>Especialista em Gestão Hospitalar</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Dr. Carlos Santos" loading="lazy">
-                        <h3>Ycaro Campovilla </h3>
-                        <p>Coordenador de Tecnologia</p>
-                        <p>PhD em Informática Médica</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500" alt="Dra. Marina Costa" loading="lazy">
-                        </h3>Enrico Digioia</h3>
-                        <p>Coordenadora de Operações</p>
-                        <p>Especialista em Fluxo Hospitalar</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="team-grid">
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500" alt="Dr. Ana Silva" loading="lazy">
-                        <h3>Arthur Borba</h3>
-                        <p>Diretora Médica</p>
-                        <p>Especialista em Gestão Hospitalar</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Dr. Carlos Santos" loading="lazy">
-                        <h3>Enzo Godoy</h3>
-                        <p>Coordenador de Tecnologia</p>
-                        <p>PhD em Informática Médica</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-member">
-                        <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500" alt="Dra. Marina Costa" loading="lazy">
-                        <h3>Ana Carolina Albi </h3>
-                        <p>Coordenadora de Operações</p>
-                        <p>Especialista em Fluxo Hospitalar</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Dashboard Sections -->
         <div class="heatmap-section">
             <h2>Ocupação Individual</h2>
@@ -543,16 +469,14 @@
 
         <div class="dashboard">
             <div class="stat-card">
+                <h3>Ocupação Hospitalar</h3>
                 <div class="chart-container">
                     <canvas id="ocupacao-chart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="historico-chart"></canvas>
                 </div>
             </div>
             <div class="stat-card">
                 <h3>Total de Internados</h3>
-                <p id="total-internados">153</p>
+                <p id="total-internados"></p>
             </div>
             <div class="stat-card">
                 <h3>Atendimentos Hoje</h3>
@@ -560,14 +484,14 @@
             </div>
             <div class="stat-card">
                 <h3>Tempo Médio</h3>
-                <p id="tempo-medio">22.5min</p>
+                <p id="tempo-medio-valor"></p>
             </div>
         </div>
 
         <div class="chart-section">
             <h2>Histórico de Ocupação</h2>
             <div class="chart-container">
-                <canvas id="ocupacao-chart" aria-label="Gráfico de histórico de ocupação"></canvas>
+                <canvas id="chart-historico" aria-label="Gráfico de histórico de ocupação"></canvas>
             </div>
         </div>
     </div>
@@ -576,8 +500,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize carousel
             initializeCarousel();
-            //loadSectorOccupancy();
-            //loadOccupancyHistory();
+            loadOccupancyHistory();
             atualizarDados();
         });
 
@@ -602,73 +525,6 @@
             }
         }
 
-        function updateCharts(data) {
-            try {
-                if (data) {
-                    const ctx = document.getElementById('ocupacao-chart');
-                    if (ctx) {
-                        // Destroy existing chart if it exists
-                        if (window.ocupacaoChart) {
-                            window.ocupacaoChart.destroy();
-                        }
-
-                        window.ocupacaoChart = new Chart(ctx.getContext('2d'), {
-                            type: 'bar',
-                            data: {
-                                labels: data.map(item => item.setor),
-                                datasets: [{
-                                    label: 'Ocupação por Setor',
-                                    data: data.map(item => item.ocupacao),
-                                    backgroundColor: [
-                                        'rgba(52, 152, 219, 0.8)',
-                                        'rgba(46, 204, 113, 0.8)',
-                                        'rgba(155, 89, 182, 0.8)',
-                                        'rgba(241, 196, 15, 0.8)',
-                                        'rgba(231, 76, 60, 0.8)'
-                                    ],
-                                    borderColor: [
-                                        'rgba(52, 152, 219, 1)',
-                                        'rgba(46, 204, 113, 1)',
-                                        'rgba(155, 89, 182, 1)',
-                                        'rgba(241, 196, 15, 1)',
-                                        'rgba(231, 76, 60, 1)'
-                                    ],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        display: true,
-                                        position: 'top'
-                                    },
-                                    tooltip: {
-                                        mode: 'index',
-                                        intersect: false
-                                    }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 100,
-                                        ticks: {
-                                            callback: function(value) {
-                                                return value + '%';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading sector occupancy:', error);
-            }
-        }
-
         async function loadOccupancyHistory() {
             try {
                 const response = await fetch('/api/sensor-data');
@@ -677,7 +533,7 @@
                 if (data) {
                     const ctx = document.getElementById('historico-chart');
                     if (ctx) {
-                        // Destroy existing chart if it exists
+                       
                         if (window.historicoChart) {
                             window.historicoChart.destroy();
                         }
@@ -799,7 +655,7 @@
 								y: {
 									min: 0,
 									max: 1,
-									//display: false,
+									
 									ticks: {
 										min: 0,
 										max: 10,
@@ -915,6 +771,81 @@
 							},
 						}
 					});
+
+					// --- Update Ocupacao Summary Chart (in stat-card) ---
+					let ocupacaoSumarioCanvas = document.getElementById("ocupacao-chart"); // Targets the first canvas with this ID
+					if (ocupacaoSumarioCanvas && ocupacaoSumarioCanvas.closest('.stat-card')) { // Ensure it's the one in a stat-card
+						let ocupacaoSumarioCtx = ocupacaoSumarioCanvas.getContext('2d');
+
+						if (window.ocupacaoSumarioChartInstance) {
+							window.ocupacaoSumarioChartInstance.destroy();
+						}
+
+						if (consolidados && consolidados.length > 0) {
+							let totalOcupacaoValor = 0;
+							consolidados.forEach(c => totalOcupacaoValor += parseFloat(c.taxa_ocupacao));
+							let mediaOcupacao = totalOcupacaoValor / consolidados.length;
+
+							window.ocupacaoSumarioChartInstance = new Chart(ocupacaoSumarioCtx, {
+								type: 'doughnut',
+								data: {
+									labels: ['Ocupado (%)', 'Livre (%)'],
+									datasets: [{
+										data: [mediaOcupacao.toFixed(2), (100 - mediaOcupacao).toFixed(2)],
+										backgroundColor: ['#2e59d9', '#9d9d9e'],
+										hoverBackgroundColor: ['#2e59d9', '#9d9d9e']
+									}]
+								},
+								options: {
+									responsive: true,
+									maintainAspectRatio: false,
+									legend: {
+										display: false
+									},
+									cutoutPercentage: 70,
+									title: {
+										display: true,
+										text: 'Ocupação Média Geral',
+										fontSize: 14
+									},
+									tooltips: {
+										callbacks: {
+											label: function(tooltipItem, data) {
+												let dataset = data.datasets[tooltipItem.datasetIndex];
+												let currentValue = dataset.data[tooltipItem.index];
+												return data.labels[tooltipItem.index] + ': ' + currentValue + '%';
+											}
+										}
+									}
+								}
+							});
+						} else {
+							ocupacaoSumarioCtx.font = "14px Arial";
+							ocupacaoSumarioCtx.textAlign = "center";
+							ocupacaoSumarioCtx.fillText("Dados de ocupação indisponíveis", ocupacaoSumarioCanvas.width / 2, ocupacaoSumarioCanvas.height / 2);
+						}
+					}
+
+					// --- Update Text Stats ---
+					// Assumes obj.sumario exists in the API response from /api/ocupacao
+					if (obj.sumario) {
+						const totalInternadosEl = document.getElementById("total-internados");
+						if (totalInternadosEl) totalInternadosEl.textContent = obj.sumario.total_internados !== undefined ? obj.sumario.total_internados : "N/A";
+
+						const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
+						if (atendimentosHojeEl) atendimentosHojeEl.textContent = obj.sumario.atendimentos_hoje !== undefined ? obj.sumario.atendimentos_hoje : "N/A";
+
+						const tempoMedioEl = document.getElementById("tempo-medio-valor"); // This ID is for "Tempo Médio"
+						if (tempoMedioEl) tempoMedioEl.textContent = obj.sumario.tempo_medio_atendimento !== undefined ? obj.sumario.tempo_medio_atendimento : "N/A";
+					} else {
+						console.warn("API response /api/ocupacao did not contain 'sumario' for text stats.");
+						const totalInternadosEl = document.getElementById("total-internados");
+						if (totalInternadosEl) totalInternadosEl.textContent = "N/A";
+						const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
+						if (atendimentosHojeEl) atendimentosHojeEl.textContent = "N/A";
+						const tempoMedioEl = document.getElementById("tempo-medio-valor");
+						if (tempoMedioEl) tempoMedioEl.textContent = "N/A";
+					}
 
 				} else {
 					await exibirErro(response);

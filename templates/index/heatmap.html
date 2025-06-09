@@ -1,293 +1,207 @@
 {% extends 'layout.html' %}
 
 {% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-* {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
+    .map-container {
+        width: 100%;
+        height: calc(100vh - 60px); /* Ajuste conforme seu header */
+    }
+    
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .logout-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
 
-        header {
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+    .logout-btn {
+        padding: 0.5rem 1rem;
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
 
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo i {
-            font-size: 2rem;
-            background: linear-gradient(45deg, #1a73e8, #4285f4);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 2s infinite;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-
-        .logo-name {
-            color: #1a73e8;
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-grid {
-            color: #4285f4;
-            font-size: 1.2rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .user-type {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            color: #1f2937;
-        }
-
-        .user-type i {
-            color: #1a73e8;
-        }
-
-        .logout-btn {
-            padding: 0.6rem 1.2rem;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #1557b0;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
-        }
-
-        #map {
-            width: 100%;
-            height: calc(100vh - 64px);
-        }
+    .logout-btn:hover {
+        background: #1557b0;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+    }
 </style>
 {% endblock %}
 
 {% block body %}
- <header>
-        <div class="header-container">
-        <div class="logo">
-            <i class="fas fa-heart-pulse"></i>
-            <div class="logo-text">
-                <span class="logo-name">Health</span>
-                <span class="logo-grid">Grid</span>
-            </div>
-        </div>
-        <div class="user-info">
-            <div class="user-type">
-                <i class="fas fa-user-md"></i>
-                <span id="userType"></span>
-            </div>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                Sair
-            </button>
-        </div>
+<div class="map-container">
+    <div class="logout-container">
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Sair
+        </button>
     </div>
+    
     <div id="map"></div>
+</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-    <script>
-        // Check if user is logged in
-       if (!localStorage.getItem('userType')) {
-    window.location.href = '/login';  // Corresponde à sua rota Flask
-}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Verifica se o usuário está logado
+    if (!localStorage.getItem('userType')) {
+        window.location.href = '/login';
+    }
 
-        // Display user type
-        document.getElementById('userType').textContent = localStorage.getItem('userType');
+    // Configuração do mapa com limites geográficos de SP
+    const map = L.map('map', {
+        center: [-23.5505, -46.6333],
+        zoom: 11,
+        minZoom: 10,
+        maxBounds: L.latLngBounds(
+            L.latLng(-23.82, -46.82), // sudoeste
+            L.latLng(-23.35, -46.38)  // nordeste
+        )
+    });
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('userType');
-            window.location.href = '/login';
-       }
+    // Camada base otimizada para visualização urbana
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors',
+        subdomains: 'abcd',
+        maxZoom: 18
+    }).addTo(map);
 
-        // Configuração do mapa com limites geográficos de SP
-        const map = L.map('map', {
-            center: [-23.5505, -46.6333],
-            zoom: 11,
-            minZoom: 10,
-            maxBounds: L.latLngBounds(
-                L.latLng(-23.82, -46.82), // sudoeste
-                L.latLng(-23.35, -46.38)  // nordeste
-            )
+    // Dados dos hospitais com localizações reais
+    const hospitals = [
+        { name: "Hospital das Clínicas", lat: -23.5568, lng: -46.6619, occupancy: 0.9, district: "Cerqueira César" },
+        { name: "Hospital São Paulo", lat: -23.5980, lng: -46.6458, occupancy: 0.75, district: "Vila Mariana" },
+        { name: "Instituto do Coração", lat: -23.5922, lng: -46.6665, occupancy: 0.3, district: "Cerqueira César" },
+        { name: "Hospital Santa Catarina", lat: -23.5732, lng: -46.6441, occupancy: 0.8, district: "Santa Cecília" },
+        { name: "Hospital Municipal M'Boi Mirim", lat: -23.6821, lng: -46.7361, occupancy: 0.6, district: "Jardim Ângela" },
+        { name: "Hospital Alemão Oswaldo Cruz", lat: -23.5689, lng: -46.6478, occupancy: 0.7, district: "Bela Vista" },
+        { name: "Hospital Sírio-Libanês", lat: -23.5667, lng: -46.6639, occupancy: 0.85, district: "Bela Vista" },
+        { name: "Hospital Santa Marcelina", lat: -23.5897, lng: -46.4772, occupancy: 0.55, district: "Itaquera" },
+        { name: "Hospital Campo Limpo", lat: -23.6472, lng: -46.7658, occupancy: 0.65, district: "Campo Limpo" }
+    ];
+
+    // Paleta de cores azul gradiente
+    const blueGradient = {
+        0.1: '#e6f2ff',
+        0.3: '#b3d7ff',
+        0.5: '#80bdff',
+        0.7: '#4da3ff',
+        0.9: '#1a88ff',
+        1.0: '#0066cc'
+    };
+
+    // Função para atualizar o heatmap
+    function updateMap() {
+        // Simulação de variação na ocupação (substituir por API real)
+        hospitals.forEach(h => {
+            h.occupancy = Math.min(0.95, Math.max(0.05, h.occupancy + (Math.random() * 0.1 - 0.05)));
         });
 
-        // Camada base otimizada para visualização urbana
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap contributors',
-            subdomains: 'abcd',
-            maxZoom: 18
+        // Prepara dados para o heatmap
+        const heatData = hospitals.map(h => [h.lat, h.lng, h.occupancy * 10]);
+        
+        // Remove layer anterior se existir
+        if (window.heatLayer) map.removeLayer(window.heatLayer);
+        
+        // Cria novo heatmap
+        window.heatLayer = L.heatLayer(heatData, {
+            radius: 35,
+            blur: 25,
+            maxZoom: 15,
+            gradient: blueGradient,
+            minOpacity: 0.5
         }).addTo(map);
 
-        // Dados dos hospitais com localizações reais
-        const hospitals = [
-            { name: "Hospital das Clínicas", lat: -23.5568, lng: -46.6619, occupancy: 0.9, district: "Cerqueira César" },
-            { name: "Hospital São Paulo", lat: -23.5980, lng: -46.6458, occupancy: 0.75, district: "Vila Mariana" },
-            { name: "Instituto do Coração", lat: -23.5922, lng: -46.6665, occupancy: 0.3, district: "Cerqueira César" },
-            { name: "Hospital Santa Catarina", lat: -23.5732, lng: -46.6441, occupancy: 0.8, district: "Santa Cecília" },
-            { name: "Hospital Municipal M'Boi Mirim", lat: -23.6821, lng: -46.7361, occupancy: 0.6, district: "Jardim Ângela" },
-            { name: "Hospital Alemão Oswaldo Cruz", lat: -23.5689, lng: -46.6478, occupancy: 0.7, district: "Bela Vista" },
-            { name: "Hospital Sírio-Libanês", lat: -23.5667, lng: -46.6639, occupancy: 0.85, district: "Bela Vista" },
-            { name: "Hospital Santa Marcelina", lat: -23.5897, lng: -46.4772, occupancy: 0.55, district: "Itaquera" },
-            { name: "Hospital Campo Limpo", lat: -23.6472, lng: -46.7658, occupancy: 0.65, district: "Campo Limpo" }
-        ];
-
-        // Paleta de cores azul gradiente
-        const blueGradient = {
-            0.1: '#e6f2ff',
-            0.3: '#b3d7ff',
-            0.5: '#80bdff',
-            0.7: '#4da3ff',
-            0.9: '#1a88ff',
-            1.0: '#0066cc'
-        };
-
-        // Função para atualizar o heatmap
-        function updateMap() {
-            // Simulação de variação na ocupação (substituir por API real)
-            hospitals.forEach(h => {
-                h.occupancy = Math.min(0.95, Math.max(0.05, h.occupancy + (Math.random() * 0.1 - 0.05)));
-            });
-
-            // Prepara dados para o heatmap
-            const heatData = hospitals.map(h => [h.lat, h.lng, h.occupancy * 10]);
-            
-            // Remove layer anterior se existir
-            if (window.heatLayer) map.removeLayer(window.heatLayer);
-            
-            // Cria novo heatmap
-            window.heatLayer = L.heatLayer(heatData, {
-                radius: 35,
-                blur: 25,
-                maxZoom: 15,
-                gradient: blueGradient,
-                minOpacity: 0.5
-            }).addTo(map);
-
-            // Atualiza marcadores
-            if (window.markers) window.markers.forEach(m => map.removeLayer(m));
-            
-            window.markers = hospitals.map(hospital => {
-                const marker = L.circleMarker([hospital.lat, hospital.lng], {
-                    radius: 8,
-                    fillColor: getColorForOccupancy(hospital.occupancy),
-                    color: '#333',
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).bindPopup(`
-                    <div style="min-width: 200px">
-                        <h4 style="margin:0 0 5px 0">${hospital.name}</h4>
-                        <p><b>Bairro:</b> ${hospital.district}</p>
-                        <p><b>Ocupação:</b> ${(hospital.occupancy * 100).toFixed(0)}%</p>
-                        <div style="height:8px; background:#eee; border-radius:4px; margin-top:5px">
-                            <div style="width:${hospital.occupancy * 100}%; height:100%; background:${getColorForOccupancy(hospital.occupancy)}; border-radius:4px"></div>
-                        </div>
+        // Atualiza marcadores
+        if (window.markers) window.markers.forEach(m => map.removeLayer(m));
+        
+        window.markers = hospitals.map(hospital => {
+            const marker = L.circleMarker([hospital.lat, hospital.lng], {
+                radius: 8,
+                fillColor: getColorForOccupancy(hospital.occupancy),
+                color: '#333',
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).bindPopup(`
+                <div style="min-width: 200px">
+                    <h4 style="margin:0 0 5px 0">${hospital.name}</h4>
+                    <p><b>Bairro:</b> ${hospital.district}</p>
+                    <p><b>Ocupação:</b> ${(hospital.occupancy * 100).toFixed(0)}%</p>
+                    <div style="height:8px; background:#eee; border-radius:4px; margin-top:5px">
+                        <div style="width:${hospital.occupancy * 100}%; height:100%; background:${getColorForOccupancy(hospital.occupancy)}; border-radius:4px"></div>
                     </div>
-                `);
-                marker.addTo(map);
-                return marker;
-            });
-        }
+                </div>
+            `);
+            marker.addTo(map);
+            return marker;
+        });
+    }
 
-        // Função auxiliar para determinar cor baseada na ocupação
-        function getColorForOccupancy(occupancy) {
-            if (occupancy < 0.3) return '#a6cee3';
-            if (occupancy < 0.5) return '#1f78b4';
-            if (occupancy < 0.7) return '#08519c';
-            return '#08306b';
-        }
+    // Função auxiliar para determinar cor baseada na ocupação
+    function getColorForOccupancy(occupancy) {
+        if (occupancy < 0.3) return '#a6cee3';
+        if (occupancy < 0.5) return '#1f78b4';
+        if (occupancy < 0.7) return '#08519c';
+        return '#08306b';
+    }
 
-        // Adiciona legenda
-        const legend = L.control({position: 'bottomright'});
-        legend.onAdd = function() {
-            const div = L.DomUtil.create('div', 'legend');
-            div.style.backgroundColor = 'white';
-            div.style.padding = '10px';
-            div.style.borderRadius = '5px';
-            div.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
-            div.innerHTML = `
-                <h4 style="margin:0 0 8px 0">Ocupação Hospitalar</h4>
-                <div style="display:flex; align-items:center; margin-bottom:5px">
-                    <div style="width:15px; height:15px; background:#a6cee3; margin-right:8px"></div>
-                    <span>0-30%</span>
-                </div>
-                <div style="display:flex; align-items:center; margin-bottom:5px">
-                    <div style="width:15px; height:15px; background:#1f78b4; margin-right:8px"></div>
-                    <span>30-50%</span>
-                </div>
-                <div style="display:flex; align-items:center; margin-bottom:5px">
-                    <div style="width:15px; height:15px; background:#08519c; margin-right:8px"></div>
-                    <span>50-70%</span>
-                </div>
-                <div style="display:flex; align-items:center">
-                    <div style="width:15px; height:15px; background:#08306b; margin-right:8px"></div>
-                    <span>70-100%</span>
-                </div>
-            `;
-            return div;
-        };
-        legend.addTo(map);
+    // Adiciona legenda
+    const legend = L.control({position: 'bottomright'});
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div', 'legend');
+        div.style.backgroundColor = 'white';
+        div.style.padding = '10px';
+        div.style.borderRadius = '5px';
+        div.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+        div.innerHTML = `
+            <h4 style="margin:0 0 8px 0">Ocupação Hospitalar</h4>
+            <div style="display:flex; align-items:center; margin-bottom:5px">
+                <div style="width:15px; height:15px; background:#a6cee3; margin-right:8px"></div>
+                <span>0-30%</span>
+            </div>
+            <div style="display:flex; align-items:center; margin-bottom:5px">
+                <div style="width:15px; height:15px; background:#1f78b4; margin-right:8px"></div>
+                <span>30-50%</span>
+            </div>
+            <div style="display:flex; align-items:center; margin-bottom:5px">
+                <div style="width:15px; height:15px; background:#08519c; margin-right:8px"></div>
+                <span>50-70%</span>
+            </div>
+            <div style="display:flex; align-items:center">
+                <div style="width:15px; height:15px; background:#08306b; margin-right:8px"></div>
+                <span>70-100%</span>
+            </div>
+        `;
+        return div;
+    };
+    legend.addTo(map);
 
-        // Inicializa e atualiza periodicamente
-        updateMap();
-        setInterval(updateMap, 5000);
-    </script>
+    // Inicializa e atualiza periodicamente
+    updateMap();
+    setInterval(updateMap, 5000);
+});
+
+function logout() {
+    // Limpa o localStorage se necessário
+    localStorage.removeItem('userType');
+    // Redireciona para a página de login
+    window.location.href = '/login';
+}
+</script>
 {% endblock %}
