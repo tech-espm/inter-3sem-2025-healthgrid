@@ -204,7 +204,7 @@ select id_especialidade, taxa_ocupacao, date_format(dia, '%d/%m/%Y') data from
 	group by id_especialidade, dia
 	order by dia, id_especialidade
 ) tmp2
-		""", parametros))
+		"""), parametros)
 		dados = []
 		for registro in registros:
 			dados.append({

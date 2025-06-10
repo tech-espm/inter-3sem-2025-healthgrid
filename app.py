@@ -2,7 +2,7 @@ from flask import Flask, render_template, json, jsonify, request, Response
 import config
 import requests
 import banco
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -26,8 +26,8 @@ def heatmap():
 def ocupacao():
     # Obter o maior id do banco
     maior_id = banco.obterIdMaximo("pca")
-    if maior_id < 800000:
-        maior_id = 800000
+    if maior_id < 850000:
+        maior_id = 850000
 
     resultado = requests.get(f'{config.url_api}?sensor=pca&id_inferior={maior_id}')
     dados_novos = resultado.json()
@@ -63,8 +63,8 @@ def ocupacao():
 def historico():
     # Obter o maior id do banco
     maior_id = banco.obterIdMaximo("pca")
-    if maior_id < 800000:
-        maior_id = 800000
+    if maior_id < 850000:
+        maior_id = 850000
 
     resultado = requests.get(f'{config.url_api}?sensor=pca&id_inferior={maior_id}')
     dados_novos = resultado.json()
@@ -73,8 +73,8 @@ def historico():
     if dados_novos and len(dados_novos) > 0:
         banco.inserirDados(dados_novos)
 
-    dataInicial = request.args["dataInicial"]
-    dataFinal = request.args["dataFinal"]
+    dataInicial = (datetime.today() + timedelta(days=-13)).strftime('%Y-%m-%d')
+    dataFinal = datetime.today().strftime('%Y-%m-%d')
     dados = banco.listarHistorico(dataInicial, dataFinal)
 
     return json.jsonify(dados)

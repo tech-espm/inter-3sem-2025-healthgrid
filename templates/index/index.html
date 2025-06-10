@@ -302,7 +302,6 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 24px;
     margin-bottom: 40px;
-    padding: 0 24px;
 }
 
 .stat-card {
@@ -406,8 +405,6 @@ body {
         height: 150px;
     }
 }
-
-}
 </style>
 {% endblock %}
 
@@ -490,7 +487,7 @@ body {
         <div class="heatmap-section">
             <h2>Ocupação Individual</h2>
             <div id="div-grafico-individual"></div>
-            <h2>Ocupação por Especialidade</h2>
+            <h2 class="mt-4">Ocupação por Especialidade</h2>
             <div id="div-grafico-consolidado"></div>
         </div>
 
@@ -502,21 +499,19 @@ body {
                 </div>
             </div>
              <div class="stat-card">
-                <h3>histórico de ocupação</h3>
+                <h3>Histórico de Ocupação</h3>
                 <div class="chart-container">
-                    <canvas id="ocupacao-chart"></canvas>
+                    <canvas id="chart-historico"></canvas>
                 </div>
-            </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Initialize carousel
             initializeCarousel();
-            loadOccupancyHistory();
-            atualizarDados();
+            await atualizarDados();
         });
 
         function initializeCarousel() {
@@ -540,69 +535,314 @@ body {
             }
         }
 
-        async function loadOccupancyHistory() {
-            try {
-                const response = await fetch('/api/sensor-data');
-                const data = await response.json();
-                
-                if (data) {
-                    const ctx = document.getElementById('historico-chart');
-                    if (ctx) {
-                       
-                        if (window.historicoChart) {
-                            window.historicoChart.destroy();
-                        }
+		function gerarGraficoOcupacao(obj) {
+			let div = document.getElementById("div-grafico-individual");
+			div.innerHTML = '<canvas id="grafico-individual" style="height: 30vh;"></canvas>';
 
-                        window.historicoChart = new Chart(ctx.getContext('2d'), {
-                            type: 'line',
-                            data: {
-                                labels: data.map(item => item.hora),
-                                datasets: [{
-                                    label: 'Histórico de Ocupação',
-                                    data: data.map(item => item.ocupacao),
-                                    borderColor: '#2ecc71',
-                                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                                    borderWidth: 2,
-                                    fill: true,
-                                    tension: 0.4
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        display: true,
-                                        position: 'top'
-                                    },
-                                    tooltip: {
-                                        mode: 'index',
-                                        intersect: false
-                                    }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 100,
-                                        ticks: {
-                                            callback: function(value) {
-                                                return value + '%';
-                                            }
-                                        }
-                                    }
-                                },
-                                interaction: {
-                                    intersect: false,
-                                    mode: 'nearest'
-                                }
-                            }
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading occupancy history:', error);
-            }
-        }
+			let labels = [], data = [];
+
+			const dados = obj?.dados;
+			const consolidados = obj?.consolidados;
+
+			if (!obj || !dados || !dados.length || !consolidados || !consolidados.length) {
+				Swal.fire("Erro", "Sem dados no período!", "error");
+				return;
+			}
+
+			for (let i = 0; i < dados.length; i++) {
+				labels.push(dados[i].especialidade + " (Id " + dados[i].id_sensor + ")");
+				data.push(dados[i].ocupacao);
+			}
+
+			let grafico = new Chart(document.getElementById("grafico-individual"), {
+				type: "bar",
+				data: {
+					labels: labels,
+					datasets: [{
+						label: "Ocupação Individual",
+						backgroundColor: "#4e73df",
+						hoverBackgroundColor: "#2e59d9",
+						borderColor: "#4e73df",
+						data: data,
+					}],
+				},
+				options: {
+					maintainAspectRatio: false,
+					layout: {
+						padding: {
+							left: 10,
+							right: 25,
+							top: 25,
+							bottom: 0
+						}
+					},
+					scales: {
+						x: {
+							gridLines: {
+								display: false,
+								drawBorder: false
+							},
+							ticks: {
+								maxTicksLimit: 10
+							},
+							maxBarThickness: 25,
+						},
+						y: {
+							min: 0,
+							max: 1,
+							
+							ticks: {
+								min: 0,
+								max: 10,
+								maxTicksLimit: 10,
+								padding: 10
+							},
+							gridLines: {
+								color: "rgb(234, 236, 244)",
+								zeroLineColor: "rgb(234, 236, 244)",
+								drawBorder: false,
+								borderDash: [2],
+								zeroLineBorderDash: [2]
+							}
+						},
+					},
+					legend: {
+						display: false
+					},
+					tooltips: {
+						titleMarginBottom: 10,
+						titleFontColor: '#6e707e',
+						titleFontSize: 14,
+						backgroundColor: "rgb(255,255,255)",
+						bodyFontColor: "#858796",
+						borderColor: '#dddfeb',
+						borderWidth: 1,
+						xPadding: 15,
+						yPadding: 15,
+						displayColors: false,
+						caretPadding: 10
+					},
+				}
+			});
+
+			div = document.getElementById("div-grafico-consolidado");
+			div.innerHTML = '<canvas id="grafico-consolidado" style="height: 30vh;"></canvas>';
+
+			labels = [];
+			data = [];
+
+			for (let i = 0; i < consolidados.length; i++) {
+				labels.push(consolidados[i].especialidade);
+				data.push(consolidados[i].taxa_ocupacao);
+			}
+
+			grafico = new Chart(document.getElementById("grafico-consolidado"), {
+				type: "bar",
+				data: {
+					labels: labels,
+					datasets: [{
+						label: "Ocupação por Especialidade",
+						backgroundColor: "#4e73df",
+						hoverBackgroundColor: "#2e59d9",
+						borderColor: "#4e73df",
+						data: data,
+					}],
+				},
+				options: {
+					maintainAspectRatio: false,
+					layout: {
+						padding: {
+							left: 10,
+							right: 25,
+							top: 25,
+							bottom: 0
+						}
+					},
+					scales: {
+						x: {
+							gridLines: {
+								display: false,
+								drawBorder: false
+							},
+							ticks: {
+								maxTicksLimit: 10
+							},
+							maxBarThickness: 25,
+						},
+						y: {
+							min: 0,
+							max: 100,
+							//display: false,
+							ticks: {
+								min: 0,
+								max: 10,
+								maxTicksLimit: 10,
+								padding: 10
+							},
+							gridLines: {
+								color: "rgb(234, 236, 244)",
+								zeroLineColor: "rgb(234, 236, 244)",
+								drawBorder: false,
+								borderDash: [2],
+								zeroLineBorderDash: [2]
+							}
+						},
+					},
+					legend: {
+						display: false
+					},
+					tooltips: {
+						titleMarginBottom: 10,
+						titleFontColor: '#6e707e',
+						titleFontSize: 14,
+						backgroundColor: "rgb(255,255,255)",
+						bodyFontColor: "#858796",
+						borderColor: '#dddfeb',
+						borderWidth: 1,
+						xPadding: 15,
+						yPadding: 15,
+						displayColors: false,
+						caretPadding: 10
+					},
+				}
+			});
+
+			let ocupacaoSumarioCanvas = document.getElementById("ocupacao-chart"); // Targets the first canvas with this ID
+			if (ocupacaoSumarioCanvas && ocupacaoSumarioCanvas.closest('.stat-card')) { // Ensure it's the one in a stat-card
+				let ocupacaoSumarioCtx = ocupacaoSumarioCanvas.getContext('2d');
+
+				if (window.ocupacaoSumarioChartInstance) {
+					window.ocupacaoSumarioChartInstance.destroy();
+				}
+
+				if (consolidados && consolidados.length > 0) {
+					let totalOcupacaoValor = 0;
+					consolidados.forEach(c => totalOcupacaoValor += parseFloat(c.taxa_ocupacao));
+					let mediaOcupacao = totalOcupacaoValor / consolidados.length;
+
+					window.ocupacaoSumarioChartInstance = new Chart(ocupacaoSumarioCtx, {
+						type: 'doughnut',
+						data: {
+							labels: ['Ocupado (%)', 'Livre (%)'],
+							datasets: [{
+								data: [mediaOcupacao.toFixed(2), (100 - mediaOcupacao).toFixed(2)],
+								backgroundColor: ['#2e59d9', '#9d9d9e'],
+								hoverBackgroundColor: ['#2e59d9', '#9d9d9e']
+							}]
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							legend: {
+								display: false
+							},
+							cutoutPercentage: 70,
+							title: {
+								display: true,
+								text: 'Ocupação Média Geral',
+								fontSize: 14
+							},
+							tooltips: {
+								callbacks: {
+									label: function(tooltipItem, data) {
+										let dataset = data.datasets[tooltipItem.datasetIndex];
+										let currentValue = dataset.data[tooltipItem.index];
+										return data.labels[tooltipItem.index] + ': ' + currentValue + '%';
+									}
+								}
+							}
+						}
+					});
+				} else {
+					ocupacaoSumarioCtx.font = "14px Arial";
+					ocupacaoSumarioCtx.textAlign = "center";
+					ocupacaoSumarioCtx.fillText("Dados de ocupação indisponíveis", ocupacaoSumarioCanvas.width / 2, ocupacaoSumarioCanvas.height / 2);
+				}
+			}
+
+		
+			if (obj.sumario) {
+				const totalInternadosEl = document.getElementById("total-internados");
+				if (totalInternadosEl) totalInternadosEl.textContent = obj.sumario.total_internados !== undefined ? obj.sumario.total_internados : "N/A";
+
+				const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
+				if (atendimentosHojeEl) atendimentosHojeEl.textContent = obj.sumario.atendimentos_hoje !== undefined ? obj.sumario.atendimentos_hoje : "N/A";
+
+				const tempoMedioEl = document.getElementById("tempo-medio-valor"); // This ID is for "Tempo Médio"
+				if (tempoMedioEl) tempoMedioEl.textContent = obj.sumario.tempo_medio_atendimento !== undefined ? obj.sumario.tempo_medio_atendimento : "N/A";
+			} else {
+				console.warn("API response /api/ocupacao did not contain 'sumario' for text stats.");
+				const totalInternadosEl = document.getElementById("total-internados");
+				if (totalInternadosEl) totalInternadosEl.textContent = "N/A";
+				const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
+				if (atendimentosHojeEl) atendimentosHojeEl.textContent = "N/A";
+				const tempoMedioEl = document.getElementById("tempo-medio-valor");
+				if (tempoMedioEl) tempoMedioEl.textContent = "N/A";
+			}
+		}
+
+		function gerarGraficoHistorico(dados) {
+			const ctx = document.getElementById('chart-historico');
+			if (ctx) {
+				
+				if (window.historicoChart) {
+					window.historicoChart.destroy();
+				}
+
+				window.historicoChart = new Chart(ctx.getContext('2d'), {
+					type: 'line',
+					data: {
+						labels: dados.filter(item => item.id_especialidade == 1).map(item => item.data),
+						datasets: [{
+							label: 'Histórico de Ocupação Pediatria',
+							data: dados.filter(item => item.id_especialidade == 1).map(item => item.taxa_ocupacao),
+							borderColor: '#2ecc71',
+							backgroundColor: 'rgba(46, 204, 113, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.4
+						}, {
+							label: 'Histórico de Ocupação UTI',
+							data: dados.filter(item => item.id_especialidade == 2).map(item => item.taxa_ocupacao),
+							borderColor: '#e74c3c',
+							backgroundColor: 'rgba(231, 76, 60, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.4
+						}]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: true,
+								position: 'top'
+							},
+							tooltip: {
+								mode: 'index',
+								intersect: false
+							}
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								max: 100,
+								ticks: {
+									callback: function(value) {
+										return value + '%';
+									}
+								}
+							}
+						},
+						interaction: {
+							intersect: false,
+							mode: 'nearest'
+						}
+					}
+				});
+			}
+		}
 
 		async function atualizarDados() {
 			waitSwal();
@@ -610,260 +850,26 @@ body {
 			try {
 
 				let response = await fetch("/api/ocupacao");
+				let obj = await response.json();
 
 				if (response.ok) {
-                    
-					Swal.close();
-
-					let div = document.getElementById("div-grafico-individual");
-					div.innerHTML = '<canvas id="grafico-individual" style="height: 30vh;"></canvas>';
-
-					let labels = [], data = [];
-
-					let obj = await response.json();
-					const dados = obj?.dados;
-					const consolidados = obj?.consolidados;
-
-					if (!obj || !dados || !dados.length || !consolidados || !consolidados.length) {
-						Swal.fire("Erro", "Sem dados no período!", "error");
-						return;
-					}
-
-					for (let i = 0; i < dados.length; i++) {
-						labels.push(dados[i].especialidade + " (Id " + dados[i].id_sensor + ")");
-						data.push(dados[i].ocupacao);
-					}
-
-					let grafico = new Chart(document.getElementById("grafico-individual"), {
-						type: "bar",
-						data: {
-							labels: labels,
-							datasets: [{
-								label: "Ocupação Individual",
-								backgroundColor: "#4e73df",
-								hoverBackgroundColor: "#2e59d9",
-								borderColor: "#4e73df",
-								data: data,
-							}],
-						},
-						options: {
-							maintainAspectRatio: false,
-							layout: {
-								padding: {
-									left: 10,
-									right: 25,
-									top: 25,
-									bottom: 0
-								}
-							},
-							scales: {
-								x: {
-									gridLines: {
-										display: false,
-										drawBorder: false
-									},
-									ticks: {
-										maxTicksLimit: 10
-									},
-									maxBarThickness: 25,
-								},
-								y: {
-									min: 0,
-									max: 1,
-									
-									ticks: {
-										min: 0,
-										max: 10,
-										maxTicksLimit: 10,
-										padding: 10
-									},
-									gridLines: {
-										color: "rgb(234, 236, 244)",
-										zeroLineColor: "rgb(234, 236, 244)",
-										drawBorder: false,
-										borderDash: [2],
-										zeroLineBorderDash: [2]
-									}
-								},
-							},
-							legend: {
-								display: false
-							},
-							tooltips: {
-								titleMarginBottom: 10,
-								titleFontColor: '#6e707e',
-								titleFontSize: 14,
-								backgroundColor: "rgb(255,255,255)",
-								bodyFontColor: "#858796",
-								borderColor: '#dddfeb',
-								borderWidth: 1,
-								xPadding: 15,
-								yPadding: 15,
-								displayColors: false,
-								caretPadding: 10
-							},
-						}
-					});
-
-					div = document.getElementById("div-grafico-consolidado");
-					div.innerHTML = '<canvas id="grafico-consolidado" style="height: 30vh;"></canvas>';
-
-					labels = [];
-					data = [];
-
-					for (let i = 0; i < consolidados.length; i++) {
-						labels.push(consolidados[i].especialidade);
-						data.push(consolidados[i].taxa_ocupacao);
-					}
-
-					grafico = new Chart(document.getElementById("grafico-consolidado"), {
-						type: "bar",
-						data: {
-							labels: labels,
-							datasets: [{
-								label: "Ocupação por Especialidade",
-								backgroundColor: "#4e73df",
-								hoverBackgroundColor: "#2e59d9",
-								borderColor: "#4e73df",
-								data: data,
-							}],
-						},
-						options: {
-							maintainAspectRatio: false,
-							layout: {
-								padding: {
-									left: 10,
-									right: 25,
-									top: 25,
-									bottom: 0
-								}
-							},
-							scales: {
-								x: {
-									gridLines: {
-										display: false,
-										drawBorder: false
-									},
-									ticks: {
-										maxTicksLimit: 10
-									},
-									maxBarThickness: 25,
-								},
-								y: {
-									min: 0,
-									max: 100,
-									//display: false,
-									ticks: {
-										min: 0,
-										max: 10,
-										maxTicksLimit: 10,
-										padding: 10
-									},
-									gridLines: {
-										color: "rgb(234, 236, 244)",
-										zeroLineColor: "rgb(234, 236, 244)",
-										drawBorder: false,
-										borderDash: [2],
-										zeroLineBorderDash: [2]
-									}
-								},
-							},
-							legend: {
-								display: false
-							},
-							tooltips: {
-								titleMarginBottom: 10,
-								titleFontColor: '#6e707e',
-								titleFontSize: 14,
-								backgroundColor: "rgb(255,255,255)",
-								bodyFontColor: "#858796",
-								borderColor: '#dddfeb',
-								borderWidth: 1,
-								xPadding: 15,
-								yPadding: 15,
-								displayColors: false,
-								caretPadding: 10
-							},
-						}
-					});
-
-					let ocupacaoSumarioCanvas = document.getElementById("ocupacao-chart"); // Targets the first canvas with this ID
-					if (ocupacaoSumarioCanvas && ocupacaoSumarioCanvas.closest('.stat-card')) { // Ensure it's the one in a stat-card
-						let ocupacaoSumarioCtx = ocupacaoSumarioCanvas.getContext('2d');
-
-						if (window.ocupacaoSumarioChartInstance) {
-							window.ocupacaoSumarioChartInstance.destroy();
-						}
-
-						if (consolidados && consolidados.length > 0) {
-							let totalOcupacaoValor = 0;
-							consolidados.forEach(c => totalOcupacaoValor += parseFloat(c.taxa_ocupacao));
-							let mediaOcupacao = totalOcupacaoValor / consolidados.length;
-
-							window.ocupacaoSumarioChartInstance = new Chart(ocupacaoSumarioCtx, {
-								type: 'doughnut',
-								data: {
-									labels: ['Ocupado (%)', 'Livre (%)'],
-									datasets: [{
-										data: [mediaOcupacao.toFixed(2), (100 - mediaOcupacao).toFixed(2)],
-										backgroundColor: ['#2e59d9', '#9d9d9e'],
-										hoverBackgroundColor: ['#2e59d9', '#9d9d9e']
-									}]
-								},
-								options: {
-									responsive: true,
-									maintainAspectRatio: false,
-									legend: {
-										display: false
-									},
-									cutoutPercentage: 70,
-									title: {
-										display: true,
-										text: 'Ocupação Média Geral',
-										fontSize: 14
-									},
-									tooltips: {
-										callbacks: {
-											label: function(tooltipItem, data) {
-												let dataset = data.datasets[tooltipItem.datasetIndex];
-												let currentValue = dataset.data[tooltipItem.index];
-												return data.labels[tooltipItem.index] + ': ' + currentValue + '%';
-											}
-										}
-									}
-								}
-							});
-						} else {
-							ocupacaoSumarioCtx.font = "14px Arial";
-							ocupacaoSumarioCtx.textAlign = "center";
-							ocupacaoSumarioCtx.fillText("Dados de ocupação indisponíveis", ocupacaoSumarioCanvas.width / 2, ocupacaoSumarioCanvas.height / 2);
-						}
-					}
-
-				
-					if (obj.sumario) {
-						const totalInternadosEl = document.getElementById("total-internados");
-						if (totalInternadosEl) totalInternadosEl.textContent = obj.sumario.total_internados !== undefined ? obj.sumario.total_internados : "N/A";
-
-						const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
-						if (atendimentosHojeEl) atendimentosHojeEl.textContent = obj.sumario.atendimentos_hoje !== undefined ? obj.sumario.atendimentos_hoje : "N/A";
-
-						const tempoMedioEl = document.getElementById("tempo-medio-valor"); // This ID is for "Tempo Médio"
-						if (tempoMedioEl) tempoMedioEl.textContent = obj.sumario.tempo_medio_atendimento !== undefined ? obj.sumario.tempo_medio_atendimento : "N/A";
-					} else {
-						console.warn("API response /api/ocupacao did not contain 'sumario' for text stats.");
-						const totalInternadosEl = document.getElementById("total-internados");
-						if (totalInternadosEl) totalInternadosEl.textContent = "N/A";
-						const atendimentosHojeEl = document.getElementById("atendimentos-hoje");
-						if (atendimentosHojeEl) atendimentosHojeEl.textContent = "N/A";
-						const tempoMedioEl = document.getElementById("tempo-medio-valor");
-						if (tempoMedioEl) tempoMedioEl.textContent = "N/A";
-					}
-
+					gerarGraficoOcupacao(obj);
 				} else {
 					await exibirErro(response);
+					return;
 				}
 
+                response = await fetch('/api/historico');
+                let dados = await response.json();
+
+				if (response.ok) {
+					gerarGraficoHistorico(dados);
+				} else {
+					await exibirErro(response);
+					return;
+				}
+
+				Swal.close();
 			} catch (ex) {
 				Swal.fire("Erro", "Erro ao listar os dados: " + ex.message, "error");
 			}
