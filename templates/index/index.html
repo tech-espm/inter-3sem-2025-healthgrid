@@ -404,6 +404,60 @@ body {
         width: 150px;
         height: 150px;
     }
+
+    .chart-container {
+        height: 320px;
+        width: 100%;
+        position: relative;
+        background: var(--white);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .chart-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .heatmap-section {
+        background: var(--white);
+        padding: 32px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 32px;
+        grid-column: 1 / -1;
+    }
+
+    .heatmap-section h2 {
+        color: var(--secondary-color);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    #div-grafico-individual,
+    #div-grafico-consolidado {
+        margin-bottom: 30px;
+        background: var(--white);
+        padding: 20px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+    }
+
+    /* Paleta de cores para gráficos */
+    :root {
+        --chart-primary: #4f46e5;
+        --chart-secondary: #10b981;
+        --chart-tertiary: #3b82f6;
+        --chart-quaternary: #f59e0b;
+        --chart-gradient-start: rgba(79, 70, 229, 0.8);
+        --chart-gradient-end: rgba(79, 70, 229, 0.2);
+    }
+    
 }
 </style>
 {% endblock %}
@@ -483,13 +537,14 @@ body {
             </div>
         </section>
 
-        <!-- Dashboard Sections -->
+     
         <div class="heatmap-section">
             <h2>Ocupação Individual</h2>
             <div id="div-grafico-individual"></div>
             <h2 class="mt-4">Ocupação por Especialidade</h2>
             <div id="div-grafico-consolidado"></div>
         </div>
+     
 
         <div class="dashboard">
             <div class="stat-card">
@@ -560,8 +615,8 @@ body {
 					labels: labels,
 					datasets: [{
 						label: "Ocupação Individual",
-						backgroundColor: "#4e73df",
-						hoverBackgroundColor: "#2e59d9",
+						backgroundColor: "#3d85c6",
+						hoverBackgroundColor: "#073763",
 						borderColor: "#4e73df",
 						data: data,
 					}],
@@ -642,8 +697,8 @@ body {
 					labels: labels,
 					datasets: [{
 						label: "Ocupação por Especialidade",
-						backgroundColor: "#4e73df",
-						hoverBackgroundColor: "#2e59d9",
+						backgroundColor: "#3d85c6",
+						hoverBackgroundColor: "#073763",
 						borderColor: "#4e73df",
 						data: data,
 					}],
@@ -726,8 +781,8 @@ body {
 							labels: ['Ocupado (%)', 'Livre (%)'],
 							datasets: [{
 								data: [mediaOcupacao.toFixed(2), (100 - mediaOcupacao).toFixed(2)],
-								backgroundColor: ['#2e59d9', '#9d9d9e'],
-								hoverBackgroundColor: ['#2e59d9', '#9d9d9e']
+								backgroundColor: ['#cfe2f3', '#3d85c6'],
+								hoverBackgroundColor: ['#9fc5e8', '#073763']
 							}]
 						},
 						options: {
@@ -796,16 +851,14 @@ body {
 						datasets: [{
 							label: 'Histórico de Ocupação Pediatria',
 							data: dados.filter(item => item.id_especialidade == 1).map(item => item.taxa_ocupacao),
-							borderColor: '#2ecc71',
-							backgroundColor: 'rgba(46, 204, 113, 0.1)',
+							borderColor: '#3d85c6',
 							borderWidth: 2,
 							fill: true,
 							tension: 0.4
 						}, {
 							label: 'Histórico de Ocupação UTI',
 							data: dados.filter(item => item.id_especialidade == 2).map(item => item.taxa_ocupacao),
-							borderColor: '#e74c3c',
-							backgroundColor: 'rgba(231, 76, 60, 0.1)',
+							borderColor: '#073763',
 							borderWidth: 2,
 							fill: true,
 							tension: 0.4
