@@ -4,14 +4,17 @@
     <a href="https://www.espm.br/cursos-de-graduacao/sistemas-de-informacao/"><img src="https://raw.githubusercontent.com/tech-espm/misc-template/main/logo.png" alt="Sistemas de Informação ESPM" style="width: 375px;"/></a>
 </p>
 
-# Sistema de Controle de Dispensa
+# Mapeamento de Disponibilidade de Leitos
 
 ### 2025-01
 
 ## Integrantes
-- [Arthur Borba](https://github.com/Borba70)
-- [Enrico Comassetto Di Gioia](https://github.com/EnricoDiGioia)
 - [Ana Carolina Albi Pereira](https://github.com/anacarolinaalbi)
+- [Arthur Borba](https://github.com/Borba70)
+- [Artur Napoles](https://github.com/NAPartur21)
+- [Enrico Comassetto Di Gioia](https://github.com/EnricoDiGioia)
+- [Enzo de Moraes Godoy](https://github.com/EnzoGodoy)
+- [Ycaro Campovilla](https://github.com/Ycakraft)
 
 ## Descrição do Projeto
 
